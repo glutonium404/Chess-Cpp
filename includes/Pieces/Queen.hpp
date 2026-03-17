@@ -13,7 +13,7 @@ public:
     )
         : Piece(
         render_window,
-        side == SIDE::BLACK ? "assets/images/b_queen.png" : "assets/images/w_queen.png",
+        side == SIDE::BLACK ? "assets/images/queen-b.png" : "assets/images/queen-w.png",
         coordinate,
         board_origin,
         square_length

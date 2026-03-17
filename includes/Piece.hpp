@@ -41,7 +41,7 @@ public:
         square_length(square_length)
     {
         setup_sprite();
-        set_piece_scale((square_length - 10.0) / texture->getSize().x);
+        set_piece_scale(square_length / texture->getSize().x);
         set_coordinate(coordinate.row, coordinate.col);
     }
 

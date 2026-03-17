@@ -3,6 +3,7 @@
 #include "Pieces/Bishop.hpp"
 #include "Pieces/King.hpp"
 #include "Pieces/Knight.hpp"
+#include "Pieces/Pawn.hpp"
 #include "Pieces/Queen.hpp"
 #include "Pieces/Rook.hpp"
 #include <SFML/Graphics.hpp>
@@ -101,8 +102,14 @@ private:
         w_pieces.reserve(16);
         b_pieces.reserve(16);
 
-        w_pieces.push_back(std::make_unique<Knight>(
-            render_window, Coordinate(4, 4), board_origin, square_length, SIDE::WHITE
+        w_pieces.push_back(std::make_unique<Pawn>(
+            render_window, Coordinate(2, 2), board_origin, square_length, SIDE::WHITE
+        ));
+        w_pieces.push_back(std::make_unique<King>(
+            render_window, Coordinate(2, 8), board_origin, square_length, SIDE::WHITE
+        ));
+        w_pieces.push_back(std::make_unique<Pawn>(
+            render_window, Coordinate(7, 7), board_origin, square_length, SIDE::BLACK
         ));
     }
 };

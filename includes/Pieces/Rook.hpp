@@ -13,7 +13,7 @@ public:
     )
         : Piece(
         render_window,
-        side == SIDE::BLACK ? "assets/images/b_rook.png" : "assets/images/w_rook.png",
+        side == SIDE::BLACK ? "assets/images/rook-b.png" : "assets/images/rook-w.png",
         coordinate,
         board_origin,
         square_length
