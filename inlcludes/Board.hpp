@@ -74,6 +74,9 @@ private:
     }
 
     void set_pieces() {
+        w_pieces.reserve(16);
+        b_pieces.reserve(16);
+
         King w_k = King(
             render_window,
             {8, 5},
@@ -90,7 +93,7 @@ private:
             SIDE::BLACK
         );
 
-
-        
+        w_pieces.push_back(w_k);
+        b_pieces.push_back(b_k);
     }
 };

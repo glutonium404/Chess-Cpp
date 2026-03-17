@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <SFML/Graphics.hpp>
 
@@ -32,7 +33,7 @@ public:
         square_length(square_length)
     {
         setup_sprite();
-        set_piece_scale((square_length - 5.0) / texture.getSize().x);
+        set_piece_scale((square_length - 10.0) / texture->getSize().x);
         set_coordinate(coordinate.x, coordinate.y);
     }
 
@@ -46,8 +47,8 @@ public:
         }
 
         sf::Vector2f pos = {
-            (col - 1) * square_length + board_origin.x,
-            (row - 1) * square_length + board_origin.y
+            (col - 1) * square_length + board_origin.x + square_length / 2,
+            (row - 1) * square_length + board_origin.y + square_length / 2
         };
 
         sprite.setPosition(pos);
@@ -58,13 +59,19 @@ public:
     }
 
 private:
-    sf::Texture texture;
+    std::shared_ptr<sf::Texture> texture;
     sf::Sprite sprite;
 
     void setup_sprite() {
-        if(!texture.loadFromFile(texture_path)) {
+        texture = std::make_shared<sf::Texture>();
+
+        if(!texture->loadFromFile(texture_path)) {
             std::cerr << "Error: Failed to load image from file" << std::endl;
         }
-        sprite.setTexture(texture);
+
+        sprite.setTexture(*texture);
+
+        sf::FloatRect local_bound = sprite.getLocalBounds();
+        sprite.setOrigin(local_bound.width / 2.f, local_bound.height / 2.f);
     }
 };
