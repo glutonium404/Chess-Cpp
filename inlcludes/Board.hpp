@@ -33,32 +33,34 @@ public:
             }
         }
 
-        for(int i=0; i<w_pieces.size(); i++) {
+        for(int i=0; i<b_pieces.size(); i++) {
             if(b_pieces[i]->is_alive) {
-                high_light_possible_moves(b_pieces[i]);
+                highlight_possible_moves(b_pieces[i]);
                 b_pieces[i]->draw();
             }
+        }
 
+        for(int i=0; i<w_pieces.size(); i++) {
             if(w_pieces[i]->is_alive) {
-                high_light_possible_moves(w_pieces[i]);
+                highlight_possible_moves(w_pieces[i]);
                 w_pieces[i]->draw();
             }
         }
     }
 
-    void high_light_possible_moves(const std::unique_ptr<Piece>& piece) {
+    void highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
         for(auto& coord: piece->get_possible_moves()) {
-            squares[coord.x - 1][coord.y - 1].setOutlineThickness(2.f);
-            squares[coord.x - 1][coord.y - 1].setOutlineColor(sf::Color::Black);
-            render_window.draw(squares[coord.x - 1][coord.y - 1]);
+            squares[coord.row - 1][coord.col - 1].setOutlineThickness(2.f);
+            squares[coord.row - 1][coord.col - 1].setOutlineColor(sf::Color::Black);
+            render_window.draw(squares[coord.row - 1][coord.col - 1]);
         }
     }
 
 private:
     std::array<std::array<sf::RectangleShape, 8>, 8> squares;
 
-    sf::Color square_color1 = sf::Color(238, 238, 210);
-    sf::Color square_color2 = sf::Color(118, 150, 86);
+    sf::Color light_square_color = sf::Color(251,194,115);
+    sf::Color dark_square_color = sf::Color(149,83,59);
 
     void set_board_origin() {
         sf::Vector2u window_dim = render_window.getSize();
@@ -74,7 +76,7 @@ private:
             for(int j=0; j<8; j++) {
                 squares[i][j] = sf::RectangleShape({square_length, square_length});
 
-                sf::Color color = flag ? square_color1 : square_color2;
+                sf::Color color = flag ? light_square_color : dark_square_color;
 
                 sf::Vector2f position = {
                     j * square_length + board_origin.x,
@@ -94,12 +96,7 @@ private:
         b_pieces.reserve(16);
 
         w_pieces.push_back(std::make_unique<King>(
-            render_window, sf::Vector2u{8, 5}, board_origin, square_length, SIDE::WHITE
+            render_window, Coordinate(8, 5), board_origin, square_length, SIDE::WHITE
         ));
-
-        b_pieces.push_back(std::make_unique<King>(
-            render_window, sf::Vector2u{1, 5}, board_origin, square_length, SIDE::BLACK
-        ));
-
     }
 };

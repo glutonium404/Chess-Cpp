@@ -11,11 +11,18 @@ enum SIDE {
     WHITE
 };
 
+struct Coordinate {
+    int row = 0;
+    int col = 0;
+
+    Coordinate(int row, int col): row(row), col(col) {};
+};
+
 class Piece {
 public:
     sf::RenderWindow& render_window;
     std::string texture_path;
-    sf::Vector2u coordinate;
+    Coordinate coordinate;
     sf::Vector2f board_origin;
     bool is_alive = true;
     float square_length;
@@ -23,7 +30,7 @@ public:
     Piece(
         sf::RenderWindow& render_window,
         std::string texture_path,
-        sf::Vector2u coordinate,
+        Coordinate coordinate,
         sf::Vector2f board_origin,
         float square_length
     )
@@ -35,18 +42,21 @@ public:
     {
         setup_sprite();
         set_piece_scale((square_length - 10.0) / texture->getSize().x);
-        set_coordinate(coordinate.x, coordinate.y);
+        set_coordinate(coordinate.row, coordinate.col);
     }
 
     virtual ~Piece() {}
 
-    virtual std::vector<sf::Vector2u> get_possible_moves() = 0;
+    virtual std::vector<Coordinate> get_possible_moves() = 0;
 
     void draw() {
         render_window.draw(sprite);
     }
 
     void set_coordinate(int row, int col) {
+
+        coordinate.row = row;
+        coordinate.col = col;
 
         if (!is_coordinate_in_bound(row, col)) {
             std::cerr << "Error: Invalid coordinate {" << row << ", " << col << "}" << std::endl;
@@ -83,8 +93,8 @@ private:
     }
 
 protected:
-    bool is_coordinate_in_bound(const sf::Vector2u& coordinate) const {
-        return !(coordinate.y < 1 || coordinate.y > 8 || coordinate.x < 1 || coordinate.x > 8);
+    bool is_coordinate_in_bound(const Coordinate& coordinate) const {
+        return !(coordinate.row < 1 || coordinate.row > 8 || coordinate.col < 1 || coordinate.col > 8);
     }
 
     bool is_coordinate_in_bound(const int row, const int col) const {

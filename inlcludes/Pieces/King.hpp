@@ -6,7 +6,7 @@ class King : public Piece {
 public:
     King(
         sf::RenderWindow& render_window,
-        sf::Vector2u coordinate,
+        Coordinate coordinate,
         sf::Vector2f board_origin,
         float square_length,
         SIDE side
@@ -20,8 +20,8 @@ public:
     )
     {}
 
-    std::vector<sf::Vector2u> get_possible_moves() override {
-        std::vector<sf::Vector2u> possible_moves;
+    std::vector<Coordinate> get_possible_moves() override {
+        std::vector<Coordinate> possible_moves;
         possible_moves.reserve(8);
 
         for(auto& coord: get_lookup_coordinates()) {
@@ -34,19 +34,20 @@ public:
     }
 
 private:
-    const std::vector<sf::Vector2u> get_lookup_coordinates() const {
-        std::vector<sf::Vector2u> lookup_coordinates(8);
+    const std::vector<Coordinate> get_lookup_coordinates() const {
+        std::vector<Coordinate> lookup_coordinates;
+        lookup_coordinates.reserve(8);
 
-        lookup_coordinates[0] = { coordinate.x - 1, coordinate.y - 1 }; // top left
-        lookup_coordinates[1] = { coordinate.x    , coordinate.y - 1 }; // top middle
-        lookup_coordinates[2] = { coordinate.x + 1, coordinate.y - 1 }; // top right
+        lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col - 1 ) ); // top left
+        lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col     ) ); // top middle
+        lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col + 1 ) ); // top right
 
-        lookup_coordinates[3] = { coordinate.x - 1, coordinate.y + 1 }; // bottom left
-        lookup_coordinates[4] = { coordinate.x    , coordinate.y + 1 }; // bottom middle
-        lookup_coordinates[5] = { coordinate.x + 1, coordinate.y + 1 }; // bottom right
+        lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col - 1 ) ); // bottom left
+        lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col     ) ); // bottom middle
+        lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col + 1 ) ); // bottom right
 
-        lookup_coordinates[6] = { coordinate.x - 1, coordinate.y     }; // center left
-        lookup_coordinates[7] = { coordinate.x + 1, coordinate.y     }; // center right
+        lookup_coordinates.push_back( Coordinate( coordinate.row    , coordinate.col - 1 ) ); // center left
+        lookup_coordinates.push_back( Coordinate( coordinate.row    , coordinate.col + 1 ) ); // center right
 
         return lookup_coordinates;
     }
