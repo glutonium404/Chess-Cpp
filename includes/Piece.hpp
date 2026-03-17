@@ -17,6 +17,10 @@ struct Coordinate {
     int col = 0;
 
     Coordinate(int row, int col): row(row), col(col) {};
+
+    bool operator==(const Coordinate& other) const {
+        return other.col == col && other.row == row;
+    }
 };
 
 class Piece {

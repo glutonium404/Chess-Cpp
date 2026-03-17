@@ -1,18 +1,49 @@
 #pragma once
 
+#include "Piece.hpp"
 #include "Pieces/Bishop.hpp"
 #include "Pieces/King.hpp"
 #include "Pieces/Knight.hpp"
 #include "Pieces/Pawn.hpp"
 #include "Pieces/Queen.hpp"
 #include "Pieces/Rook.hpp"
-#include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <array>
+#include <iostream>
 #include <memory>
+#include <tuple>
+
+struct Square {
+public:
+    enum class TYPE { LIGHT, DARK };
+
+    inline static const sf::Color light_color     = sf::Color(251,194,115);
+    inline static const sf::Color dark_color      = sf::Color(149,83,59);
+    inline static const sf::Color highlight_color = sf::Color(140, 194, 255);
+
+    TYPE type;
+    sf::RectangleShape shape;
+
+
+    void highlight() {
+        shape.setOutlineThickness(1.f);
+        shape.setOutlineColor(sf::Color::Black);
+        shape.setFillColor(Square::highlight_color);
+    }
+
+    void unhighlight() {
+        shape.setOutlineThickness(0.f);
+        shape.setOutlineColor(sf::Color::Transparent);
+        shape.setFillColor(
+            type == TYPE::LIGHT ? Square::light_color : Square::dark_color
+        );
+    }
+
+private:
+};
 
 class Board {
 public:
@@ -38,42 +69,112 @@ public:
     }
 
     void draw() {
+        handle_click();
+
         for(auto& square_array: squares) {
             for(auto& square: square_array) {
-                render_window.draw(square);
+                render_window.draw(square.shape);
             }
         }
 
         for(int i=0; i<b_pieces.size(); i++) {
             if(b_pieces[i]->is_alive) {
-                /*highlight_possible_moves(b_pieces[i]);*/
                 b_pieces[i]->draw();
             }
         }
 
         for(int i=0; i<w_pieces.size(); i++) {
             if(w_pieces[i]->is_alive) {
-                /*highlight_possible_moves(w_pieces[i]);*/
                 w_pieces[i]->draw();
             }
         }
     }
 
     void highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
-        for(auto& coord: piece->get_possible_moves()) {
-            squares[coord.row - 1][coord.col - 1].setOutlineThickness(1.f);
-            squares[coord.row - 1][coord.col - 1].setOutlineColor(sf::Color::Black);
-            squares[coord.row - 1][coord.col - 1].setFillColor(highlight_square_color);
-            render_window.draw(squares[coord.row - 1][coord.col - 1]);
+        remove_existing_highilights();
+
+        highlighted_coord = piece->get_possible_moves();
+
+        for(auto& coord: highlighted_coord) {
+            auto& highlighted_square = squares[coord.row - 1][coord.col - 1];
+            highlighted_square.highlight();
+            render_window.draw(highlighted_square.shape);
+        }
+    }
+
+    void remove_existing_highilights() {
+        for(auto& coord: highlighted_coord) {
+            auto& highlighted_square = squares[coord.row - 1][coord.col - 1];
+            highlighted_square.unhighlight();
+            render_window.draw(highlighted_square.shape);
         }
     }
 
 private:
-    std::array<std::array<sf::RectangleShape, 8>, 8> squares;
+    std::array<std::array<Square, 8>, 8>    squares;
+    std::vector<Coordinate>                 highlighted_coord;
 
-    sf::Color light_square_color = sf::Color(251,194,115);
-    sf::Color dark_square_color = sf::Color(149,83,59);
-    sf::Color highlight_square_color = sf::Color(140, 194, 255);
+    sf::Mouse mouse;
+
+    // the index (int) being negative = no piece selected
+    std::tuple<SIDE, int> selected_piece = std::make_tuple(SIDE::BLACK, -1);
+
+    void handle_click() {
+        if(is_mouse_clicked()) {
+            set_selected_piece();
+
+            int&  selected_index  = std::get<1>(selected_piece);
+            SIDE& selected_side   = std::get<0>(selected_piece);
+            auto& selected_vector = (selected_side == SIDE::WHITE) ? w_pieces : b_pieces;
+
+            if(selected_index != -1) {
+                highlight_possible_moves(selected_vector[selected_index]);
+            }
+        }
+    }
+
+    bool is_mouse_clicked() {
+        auto pos = mouse.getPosition(render_window);
+        return mouse.isButtonPressed(mouse.Left) && board_local_bound.contains(pos.x, pos.y);
+    }
+
+    void set_selected_piece() {
+        auto clicked_coordinate = get_clicked_coordinate();
+
+        for(int i=0; i<w_pieces.size(); i++) {
+            if(!w_pieces[i]->is_alive) continue;
+
+            if(w_pieces[i]->coordinate == clicked_coordinate) {
+                selected_piece = std::make_tuple(SIDE::WHITE, i);
+                return;
+            }
+        }
+
+        for(int i=0; i<b_pieces.size(); i++) {
+            if(!b_pieces[i]->is_alive) continue;
+
+            if(b_pieces[i]->coordinate == clicked_coordinate) {
+                selected_piece = std::make_tuple(SIDE::BLACK, i);
+                return;
+            }
+        }
+
+        selected_piece = std::make_tuple(SIDE::BLACK, -1);
+    }
+
+    Coordinate get_clicked_coordinate() {
+        // get mouse position relative to the window
+        sf::Vector2i mouse_pixel_pos = sf::Mouse::getPosition(render_window);
+
+        // map pixels to world coordinates (handles scaling/views)
+        sf::Vector2f mouse_pos = render_window.mapPixelToCoords(mouse_pixel_pos);
+
+        // calculate 1 based coordinates
+        int row = static_cast<int>((mouse_pos.y - board_local_bound.top) / square_length) + 1;
+        int col = static_cast<int>((mouse_pos.x - board_local_bound.left) / square_length) + 1;
+
+        return Coordinate(row, col);
+    }
 
     void set_board_local_bound() {
         sf::Vector2u window_dim = render_window.getSize();
@@ -92,17 +193,20 @@ private:
 
         for(int i=0; i<8; i++) {
             for(int j=0; j<8; j++) {
-                squares[i][j] = sf::RectangleShape({square_length, square_length});
 
-                sf::Color color = flag ? light_square_color : dark_square_color;
+                sf::Color color = flag ? Square::light_color : Square::dark_color;
 
                 sf::Vector2f position = {
                     j * square_length + board_local_bound.left,
                     i * square_length + board_local_bound.top
                 };
 
-                squares[i][j].setFillColor(color);
-                squares[i][j].setPosition(position);
+                squares[i][j].shape = sf::RectangleShape({square_length, square_length});
+
+                squares[i][j].shape.setFillColor(color);
+                squares[i][j].shape.setPosition(position);
+
+                squares[i][j].type = flag ? Square::TYPE::LIGHT : Square::TYPE::DARK;
 
                 if(j != 7) { flag = !flag; }
             }
