@@ -25,6 +25,9 @@ public:
         : board_width(board_width),
         render_window(render_window)
     {
+        w_pieces.reserve(16);
+        b_pieces.reserve(16);
+
         square_length = board_width / 8.0;
         set_board_origin();
         set_squares_shapes();
@@ -40,14 +43,14 @@ public:
 
         for(int i=0; i<b_pieces.size(); i++) {
             if(b_pieces[i]->is_alive) {
-                highlight_possible_moves(b_pieces[i]);
+                /*highlight_possible_moves(b_pieces[i]);*/
                 b_pieces[i]->draw();
             }
         }
 
         for(int i=0; i<w_pieces.size(); i++) {
             if(w_pieces[i]->is_alive) {
-                highlight_possible_moves(w_pieces[i]);
+                /*highlight_possible_moves(w_pieces[i]);*/
                 w_pieces[i]->draw();
             }
         }
@@ -99,17 +102,75 @@ private:
     }
 
     void set_pieces() {
-        w_pieces.reserve(16);
-        b_pieces.reserve(16);
+        b_pieces.push_back( make_rook   (1, 1, SIDE::BLACK) );
+        b_pieces.push_back( make_knight (1, 2, SIDE::BLACK) );
+        b_pieces.push_back( make_bishop (1, 3, SIDE::BLACK) );
+        b_pieces.push_back( make_queen  (1, 4, SIDE::BLACK) );
+        b_pieces.push_back( make_king   (1, 5, SIDE::BLACK) );
+        b_pieces.push_back( make_bishop (1, 6, SIDE::BLACK) );
+        b_pieces.push_back( make_knight (1, 7, SIDE::BLACK) );
+        b_pieces.push_back( make_rook   (1, 8, SIDE::BLACK) );
 
-        w_pieces.push_back(std::make_unique<Pawn>(
-            render_window, Coordinate(2, 2), board_origin, square_length, SIDE::WHITE
-        ));
-        w_pieces.push_back(std::make_unique<King>(
-            render_window, Coordinate(2, 8), board_origin, square_length, SIDE::WHITE
-        ));
-        w_pieces.push_back(std::make_unique<Pawn>(
-            render_window, Coordinate(7, 7), board_origin, square_length, SIDE::BLACK
-        ));
+        b_pieces.push_back( make_pawn   (2, 1, SIDE::BLACK) );
+        b_pieces.push_back( make_pawn   (2, 2, SIDE::BLACK) );
+        b_pieces.push_back( make_pawn   (2, 3, SIDE::BLACK) );
+        b_pieces.push_back( make_pawn   (2, 4, SIDE::BLACK) );
+        b_pieces.push_back( make_pawn   (2, 5, SIDE::BLACK) );
+        b_pieces.push_back( make_pawn   (2, 6, SIDE::BLACK) );
+        b_pieces.push_back( make_pawn   (2, 7, SIDE::BLACK) );
+        b_pieces.push_back( make_pawn   (2, 8, SIDE::BLACK) );
+
+
+
+        w_pieces.push_back( make_rook   (8, 1, SIDE::WHITE) );
+        w_pieces.push_back( make_knight (8, 2, SIDE::WHITE) );
+        w_pieces.push_back( make_bishop (8, 3, SIDE::WHITE) );
+        w_pieces.push_back( make_queen  (8, 4, SIDE::WHITE) );
+        w_pieces.push_back( make_king   (8, 5, SIDE::WHITE) );
+        w_pieces.push_back( make_bishop (8, 6, SIDE::WHITE) );
+        w_pieces.push_back( make_knight (8, 7, SIDE::WHITE) );
+        w_pieces.push_back( make_rook   (8, 8, SIDE::WHITE) );
+
+        w_pieces.push_back( make_pawn(7, 1, SIDE::WHITE) );
+        w_pieces.push_back( make_pawn(7, 2, SIDE::WHITE) );
+        w_pieces.push_back( make_pawn(7, 3, SIDE::WHITE) );
+        w_pieces.push_back( make_pawn(7, 4, SIDE::WHITE) );
+        w_pieces.push_back( make_pawn(7, 5, SIDE::WHITE) );
+        w_pieces.push_back( make_pawn(7, 6, SIDE::WHITE) );
+        w_pieces.push_back( make_pawn(7, 7, SIDE::WHITE) );
+        w_pieces.push_back( make_pawn(7, 8, SIDE::WHITE) );
+    }
+
+    std::unique_ptr<Piece> make_pawn(int row, int col, SIDE side) {
+        return std::make_unique<Pawn>(
+            render_window, Coordinate(row, col), board_origin, square_length, side
+        );
+    }
+
+    std::unique_ptr<Piece> make_king(int row, int col, SIDE side) {
+        return std::make_unique<King>(
+            render_window, Coordinate(row, col), board_origin, square_length, side
+        );
+    }
+
+    std::unique_ptr<Piece> make_queen(int row, int col, SIDE side) {
+        return std::make_unique<Queen>(
+            render_window, Coordinate(row, col), board_origin, square_length, side
+        );
+    }
+    std::unique_ptr<Piece> make_rook(int row, int col, SIDE side) {
+        return std::make_unique<Rook>(
+            render_window, Coordinate(row, col), board_origin, square_length, side
+        );
+    }
+    std::unique_ptr<Piece> make_knight(int row, int col, SIDE side) {
+        return std::make_unique<Knight>(
+            render_window, Coordinate(row, col), board_origin, square_length, side
+        );
+    }
+    std::unique_ptr<Piece> make_bishop(int row, int col, SIDE side) {
+        return std::make_unique<Bishop>(
+            render_window, Coordinate(row, col), board_origin, square_length, side
+        );
     }
 };
