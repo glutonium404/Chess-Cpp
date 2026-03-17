@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Piece.hpp"
+#include <SFML/Graphics/Rect.hpp>
 
 class Bishop : public Piece {
 public:
     Bishop(
         sf::RenderWindow& render_window,
         Coordinate coordinate,
-        sf::Vector2f board_origin,
+        sf::FloatRect board_local_bound,
         float square_length,
         SIDE side
     )
@@ -15,7 +16,7 @@ public:
         render_window,
         side == SIDE::BLACK ? "assets/images/bishop-b.png" : "assets/images/bishop-w.png",
         coordinate,
-        board_origin,
+        board_local_bound,
         square_length
     )
     {}

@@ -8,16 +8,18 @@
 #include "Pieces/Rook.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <array>
 #include <memory>
 
 class Board {
 public:
-    float board_width;
-    float square_length;
-    sf::RenderWindow& render_window;
-    sf::Vector2f board_origin;
+    float                               board_width;
+    float                               square_length;
+    sf::RenderWindow&                   render_window;
+    sf::FloatRect                       board_local_bound;
     std::vector<std::unique_ptr<Piece>> b_pieces;
     std::vector<std::unique_ptr<Piece>> w_pieces;
 
@@ -29,7 +31,8 @@ public:
         b_pieces.reserve(16);
 
         square_length = board_width / 8.0;
-        set_board_origin();
+
+        set_board_local_bound();
         set_squares_shapes();
         set_pieces();
     }
@@ -72,11 +75,16 @@ private:
     sf::Color dark_square_color = sf::Color(149,83,59);
     sf::Color highlight_square_color = sf::Color(140, 194, 255);
 
-    void set_board_origin() {
+    void set_board_local_bound() {
         sf::Vector2u window_dim = render_window.getSize();
         float offset_x = (window_dim.x - board_width) / 2.0;
         float offset_y = (window_dim.y - board_width) / 2.0;
-        board_origin = { offset_x, offset_y };
+
+
+        board_local_bound.left      = offset_x;
+        board_local_bound.top       = offset_y;
+        board_local_bound.width     = square_length * 8.f;
+        board_local_bound.height    = square_length * 8.f;
     }
 
     void set_squares_shapes() {
@@ -89,8 +97,8 @@ private:
                 sf::Color color = flag ? light_square_color : dark_square_color;
 
                 sf::Vector2f position = {
-                    j * square_length + board_origin.x,
-                    i * square_length + board_origin.y
+                    j * square_length + board_local_bound.left,
+                    i * square_length + board_local_bound.top
                 };
 
                 squares[i][j].setFillColor(color);
@@ -143,34 +151,34 @@ private:
 
     std::unique_ptr<Piece> make_pawn(int row, int col, SIDE side) {
         return std::make_unique<Pawn>(
-            render_window, Coordinate(row, col), board_origin, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, square_length, side
         );
     }
 
     std::unique_ptr<Piece> make_king(int row, int col, SIDE side) {
         return std::make_unique<King>(
-            render_window, Coordinate(row, col), board_origin, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, square_length, side
         );
     }
 
     std::unique_ptr<Piece> make_queen(int row, int col, SIDE side) {
         return std::make_unique<Queen>(
-            render_window, Coordinate(row, col), board_origin, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, square_length, side
         );
     }
     std::unique_ptr<Piece> make_rook(int row, int col, SIDE side) {
         return std::make_unique<Rook>(
-            render_window, Coordinate(row, col), board_origin, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, square_length, side
         );
     }
     std::unique_ptr<Piece> make_knight(int row, int col, SIDE side) {
         return std::make_unique<Knight>(
-            render_window, Coordinate(row, col), board_origin, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, square_length, side
         );
     }
     std::unique_ptr<Piece> make_bishop(int row, int col, SIDE side) {
         return std::make_unique<Bishop>(
-            render_window, Coordinate(row, col), board_origin, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, square_length, side
         );
     }
 };

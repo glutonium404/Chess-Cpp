@@ -7,7 +7,7 @@ public:
     King(
         sf::RenderWindow& render_window,
         Coordinate coordinate,
-        sf::Vector2f board_origin,
+        sf::FloatRect board_local_bound,
         float square_length,
         SIDE side
     )
@@ -15,7 +15,7 @@ public:
         render_window,
         side == SIDE::BLACK ? "assets/images/king-b.png" : "assets/images/king-w.png",
         coordinate,
-        board_origin,
+        board_local_bound,
         square_length
     )
     {}

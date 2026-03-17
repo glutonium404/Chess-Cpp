@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <memory>
@@ -23,7 +24,7 @@ public:
     sf::RenderWindow& render_window;
     std::string texture_path;
     Coordinate coordinate;
-    sf::Vector2f board_origin;
+    sf::FloatRect board_local_bound;
     bool is_alive = true;
     float square_length;
 
@@ -31,13 +32,13 @@ public:
         sf::RenderWindow& render_window,
         std::string texture_path,
         Coordinate coordinate,
-        sf::Vector2f board_origin,
+        sf::FloatRect board_local_bound,
         float square_length
     )
         : render_window(render_window),
         texture_path(texture_path),
         coordinate(coordinate),
-        board_origin(board_origin),
+        board_local_bound(board_local_bound),
         square_length(square_length)
     {
         setup_sprite();
@@ -64,8 +65,8 @@ public:
         }
 
         sf::Vector2f pos = {
-            (col - 1) * square_length + board_origin.x + square_length / 2,
-            (row - 1) * square_length + board_origin.y + square_length / 2
+            (col - 1) * square_length + board_local_bound.left + square_length / 2,
+            (row - 1) * square_length + board_local_bound.top  + square_length / 2
         };
 
         sprite.setPosition(pos);
