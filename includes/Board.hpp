@@ -1,7 +1,10 @@
 #pragma once
 
+#include "Pieces/Bishop.hpp"
 #include "Pieces/King.hpp"
+#include "Pieces/Knight.hpp"
 #include "Pieces/Queen.hpp"
+#include "Pieces/Rook.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -51,7 +54,7 @@ public:
 
     void highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
         for(auto& coord: piece->get_possible_moves()) {
-            squares[coord.row - 1][coord.col - 1].setOutlineThickness(2.f);
+            squares[coord.row - 1][coord.col - 1].setOutlineThickness(1.f);
             squares[coord.row - 1][coord.col - 1].setOutlineColor(sf::Color::Black);
             squares[coord.row - 1][coord.col - 1].setFillColor(highlight_square_color);
             render_window.draw(squares[coord.row - 1][coord.col - 1]);
@@ -98,8 +101,8 @@ private:
         w_pieces.reserve(16);
         b_pieces.reserve(16);
 
-        w_pieces.push_back(std::make_unique<Queen>(
-            render_window, Coordinate(8, 8), board_origin, square_length, SIDE::WHITE
+        w_pieces.push_back(std::make_unique<Knight>(
+            render_window, Coordinate(4, 4), board_origin, square_length, SIDE::WHITE
         ));
     }
 };
