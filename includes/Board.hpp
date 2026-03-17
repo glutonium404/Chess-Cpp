@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Pieces/King.hpp"
+#include "Pieces/Queen.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -52,6 +53,7 @@ public:
         for(auto& coord: piece->get_possible_moves()) {
             squares[coord.row - 1][coord.col - 1].setOutlineThickness(2.f);
             squares[coord.row - 1][coord.col - 1].setOutlineColor(sf::Color::Black);
+            squares[coord.row - 1][coord.col - 1].setFillColor(highlight_square_color);
             render_window.draw(squares[coord.row - 1][coord.col - 1]);
         }
     }
@@ -61,6 +63,7 @@ private:
 
     sf::Color light_square_color = sf::Color(251,194,115);
     sf::Color dark_square_color = sf::Color(149,83,59);
+    sf::Color highlight_square_color = sf::Color(140, 194, 255);
 
     void set_board_origin() {
         sf::Vector2u window_dim = render_window.getSize();
@@ -95,8 +98,8 @@ private:
         w_pieces.reserve(16);
         b_pieces.reserve(16);
 
-        w_pieces.push_back(std::make_unique<King>(
-            render_window, Coordinate(8, 5), board_origin, square_length, SIDE::WHITE
+        w_pieces.push_back(std::make_unique<Queen>(
+            render_window, Coordinate(8, 8), board_origin, square_length, SIDE::WHITE
         ));
     }
 };
