@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <array>
+#include <memory>
 
 class Board {
 public:
@@ -12,8 +13,8 @@ public:
     float square_length;
     sf::RenderWindow& render_window;
     sf::Vector2f board_origin;
-    std::vector<Piece> b_pieces;
-    std::vector<Piece> w_pieces;
+    std::vector<std::unique_ptr<Piece>> b_pieces;
+    std::vector<std::unique_ptr<Piece>> w_pieces;
 
     Board(float board_width, sf::RenderWindow& render_window)
         : board_width(board_width),
@@ -33,8 +34,23 @@ public:
         }
 
         for(int i=0; i<w_pieces.size(); i++) {
-            if(b_pieces[i].is_alive) { b_pieces[i].draw(); }
-            if(w_pieces[i].is_alive) { w_pieces[i].draw(); }
+            if(b_pieces[i]->is_alive) {
+                high_light_possible_moves(b_pieces[i]);
+                b_pieces[i]->draw();
+            }
+
+            if(w_pieces[i]->is_alive) {
+                high_light_possible_moves(w_pieces[i]);
+                w_pieces[i]->draw();
+            }
+        }
+    }
+
+    void high_light_possible_moves(const std::unique_ptr<Piece>& piece) {
+        for(auto& coord: piece->get_possible_moves()) {
+            squares[coord.x - 1][coord.y - 1].setOutlineThickness(2.f);
+            squares[coord.x - 1][coord.y - 1].setOutlineColor(sf::Color::Black);
+            render_window.draw(squares[coord.x - 1][coord.y - 1]);
         }
     }
 
@@ -77,23 +93,13 @@ private:
         w_pieces.reserve(16);
         b_pieces.reserve(16);
 
-        King w_k = King(
-            render_window,
-            {8, 5},
-            board_origin,
-            square_length,
-            SIDE::WHITE
-        );
+        w_pieces.push_back(std::make_unique<King>(
+            render_window, sf::Vector2u{8, 5}, board_origin, square_length, SIDE::WHITE
+        ));
 
-        King b_k = King(
-            render_window,
-            {1, 5},
-            board_origin,
-            square_length,
-            SIDE::BLACK
-        );
+        b_pieces.push_back(std::make_unique<King>(
+            render_window, sf::Vector2u{1, 5}, board_origin, square_length, SIDE::BLACK
+        ));
 
-        w_pieces.push_back(w_k);
-        b_pieces.push_back(b_k);
     }
 };
