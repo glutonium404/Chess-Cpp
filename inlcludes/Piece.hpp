@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -37,13 +38,19 @@ public:
         set_coordinate(coordinate.x, coordinate.y);
     }
 
+    virtual ~Piece() {}
+
+    virtual std::vector<sf::Vector2u> get_possible_moves() = 0;
+
     void draw() {
         render_window.draw(sprite);
     }
 
     void set_coordinate(int row, int col) {
-        if(row <= 0 || col <= 0) {
+
+        if (!is_coordinate_in_bound(row, col)) {
             std::cerr << "Error: Invalid coordinate {" << row << ", " << col << "}" << std::endl;
+            return;
         }
 
         sf::Vector2f pos = {
@@ -73,5 +80,14 @@ private:
 
         sf::FloatRect local_bound = sprite.getLocalBounds();
         sprite.setOrigin(local_bound.width / 2.f, local_bound.height / 2.f);
+    }
+
+protected:
+    bool is_coordinate_in_bound(const sf::Vector2u& coordinate) const {
+        return !(coordinate.y < 1 || coordinate.y > 8 || coordinate.x < 1 || coordinate.x > 8);
+    }
+
+    bool is_coordinate_in_bound(const int row, const int col) const {
+        return !(row < 1 || row > 8 || col < 1 || col > 8);
     }
 };
