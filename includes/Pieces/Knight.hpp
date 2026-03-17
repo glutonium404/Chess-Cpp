@@ -25,6 +25,8 @@ public:
         possible_moves.reserve(8); // 8 = maximum possible moves
 
         for(auto& coord: get_lookup_coordinates()) {
+            if(!is_coordinate_in_bound(coord)) continue;
+
             possible_moves.push_back(coord);
         }
 
