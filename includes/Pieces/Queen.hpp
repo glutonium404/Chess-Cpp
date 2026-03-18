@@ -5,11 +5,11 @@
 class Queen : public Piece {
 public:
     Queen(
-        sf::RenderWindow& render_window,
-        Coordinate coordinate,
-        sf::FloatRect board_local_bound,
-        float square_length,
-        SIDE side
+        sf::RenderWindow&   render_window,
+        Coordinate          coordinate,
+        sf::FloatRect       board_local_bound,
+        float               square_length,
+        SIDE                side
     )
         : Piece(
         render_window,

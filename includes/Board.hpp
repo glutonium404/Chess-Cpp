@@ -11,6 +11,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <array>
 #include <iostream>
 #include <memory>
@@ -54,8 +55,7 @@ public:
     std::vector<std::unique_ptr<Piece>> w_pieces;
 
     Board(float board_width, sf::RenderWindow& render_window)
-        : board_width(board_width),
-        render_window(render_window)
+        : board_width(board_width), render_window(render_window)
     {
         w_pieces.reserve(16);
         b_pieces.reserve(16);
@@ -110,10 +110,9 @@ public:
     }
 
 private:
-    std::array<std::array<Square, 8>, 8>    squares;
+    sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
-
-    sf::Mouse mouse;
+    std::array<std::array<Square, 8>, 8>    squares;
 
     struct SelectedPiece {
         bool is_any_selected = false;
@@ -125,17 +124,17 @@ private:
         if(is_mouse_clicked()) {
             set_selected_piece();
 
-            auto& selected_vector = (selected_piece.side == SIDE::WHITE) ? w_pieces : b_pieces;
+            auto& selected_piece_set = (selected_piece.side == SIDE::WHITE) ? w_pieces : b_pieces;
 
             if(selected_piece.is_any_selected) {
-                highlight_possible_moves(selected_vector[selected_piece.index]);
+                highlight_possible_moves(selected_piece_set[selected_piece.index]);
             }else {
                 remove_existing_highilights();
             }
         }
     }
 
-    bool is_mouse_clicked() {
+    bool is_mouse_clicked() const {
         auto pos = mouse.getPosition(render_window);
         return mouse.isButtonPressed(mouse.Left) && board_local_bound.contains(pos.x, pos.y);
     }
@@ -147,22 +146,22 @@ private:
             if(!w_pieces[i]->is_alive) continue;
 
             if(w_pieces[i]->coordinate == clicked_coordinate) {
-                selected_piece.is_any_selected = true;
-                selected_piece.side = SIDE::WHITE;
-                selected_piece.index = i;
+                selected_piece.is_any_selected  = true;
+                selected_piece.side             = SIDE::WHITE;
+                selected_piece.index            = i;
+
                 return;
             }
-
-                selected_piece.is_any_selected = false;
         }
 
         for(int i=0; i<b_pieces.size(); i++) {
             if(!b_pieces[i]->is_alive) continue;
 
             if(b_pieces[i]->coordinate == clicked_coordinate) {
-                selected_piece.is_any_selected = true;
-                selected_piece.side = SIDE::BLACK;
-                selected_piece.index = i;
+                selected_piece.is_any_selected  = true;
+                selected_piece.side             = SIDE::BLACK;
+                selected_piece.index            = i;
+
                 return;
             }
         }
@@ -186,9 +185,9 @@ private:
 
     void set_board_local_bound() {
         sf::Vector2u window_dim = render_window.getSize();
+
         float offset_x = (window_dim.x - board_width) / 2.0;
         float offset_y = (window_dim.y - board_width) / 2.0;
-
 
         board_local_bound.left      = offset_x;
         board_local_bound.top       = offset_y;

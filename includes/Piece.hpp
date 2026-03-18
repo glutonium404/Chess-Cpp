@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 #include <memory>
@@ -25,12 +26,12 @@ struct Coordinate {
 
 class Piece {
 public:
-    sf::RenderWindow& render_window;
-    std::string texture_path;
-    Coordinate coordinate;
-    sf::FloatRect board_local_bound;
-    bool is_alive = true;
-    float square_length;
+    sf::RenderWindow&   render_window;
+    std::string         texture_path;
+    Coordinate          coordinate;
+    sf::FloatRect       board_local_bound;
+    bool                is_alive = true;
+    float               square_length;
 
     Piece(
         sf::RenderWindow& render_window,
@@ -82,7 +83,7 @@ public:
 
 private:
     std::shared_ptr<sf::Texture> texture;
-    sf::Sprite sprite;
+    sf::Sprite                   sprite;
 
     void setup_sprite() {
         texture = std::make_shared<sf::Texture>();
