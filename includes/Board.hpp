@@ -262,34 +262,34 @@ private:
 
     std::unique_ptr<Piece> make_pawn(int row, int col, SIDE side) {
         return std::make_unique<Pawn>(
-            render_window, Coordinate(row, col), board_local_bound, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, side
         );
     }
 
     std::unique_ptr<Piece> make_king(int row, int col, SIDE side) {
         return std::make_unique<King>(
-            render_window, Coordinate(row, col), board_local_bound, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, side
         );
     }
 
     std::unique_ptr<Piece> make_queen(int row, int col, SIDE side) {
         return std::make_unique<Queen>(
-            render_window, Coordinate(row, col), board_local_bound, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, side
         );
     }
     std::unique_ptr<Piece> make_rook(int row, int col, SIDE side) {
         return std::make_unique<Rook>(
-            render_window, Coordinate(row, col), board_local_bound, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, side
         );
     }
     std::unique_ptr<Piece> make_knight(int row, int col, SIDE side) {
         return std::make_unique<Knight>(
-            render_window, Coordinate(row, col), board_local_bound, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, side
         );
     }
     std::unique_ptr<Piece> make_bishop(int row, int col, SIDE side) {
         return std::make_unique<Bishop>(
-            render_window, Coordinate(row, col), board_local_bound, square_length, side
+            render_window, Coordinate(row, col), board_local_bound, side
         );
     }
 };

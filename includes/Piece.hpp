@@ -37,15 +37,15 @@ public:
         sf::RenderWindow& render_window,
         std::string texture_path,
         Coordinate coordinate,
-        sf::FloatRect board_local_bound,
-        float square_length
+        sf::FloatRect board_local_bound
     )
         : render_window(render_window),
         texture_path(texture_path),
         coordinate(coordinate),
-        board_local_bound(board_local_bound),
-        square_length(square_length)
+        board_local_bound(board_local_bound)
     {
+        square_length = board_local_bound.width / 8.f;
+
         setup_sprite();
         set_piece_scale(square_length / texture->getSize().x);
         set_coordinate(coordinate.row, coordinate.col);

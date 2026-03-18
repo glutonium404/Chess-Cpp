@@ -8,15 +8,13 @@ public:
         sf::RenderWindow&   render_window,
         Coordinate          coordinate,
         sf::FloatRect       board_local_bound,
-        float               square_length,
         SIDE                side
     )
         : Piece(
         render_window,
         side == SIDE::BLACK ? "assets/images/knight-b.png" : "assets/images/knight-w.png",
         coordinate,
-        board_local_bound,
-        square_length
+        board_local_bound
     )
     {}
 
