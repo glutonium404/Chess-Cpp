@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
-#include "includes/Board.hpp"
+#include "includes/Board/Board.hpp"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(640, 480), "Hello World");
