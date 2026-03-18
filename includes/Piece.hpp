@@ -61,13 +61,13 @@ public:
 
     void set_coordinate(int row, int col) {
 
-        coordinate.row = row;
-        coordinate.col = col;
-
         if (!is_coordinate_in_bound(row, col)) {
             std::cerr << "Error: Invalid coordinate {" << row << ", " << col << "}" << std::endl;
             return;
         }
+
+        coordinate.row = row;
+        coordinate.col = col;
 
         sf::Vector2f pos = {
             (col - 1) * square_length + board_local_bound.left + square_length / 2,
