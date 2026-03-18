@@ -129,6 +129,8 @@ private:
 
             if(selected_index != -1) {
                 highlight_possible_moves(selected_vector[selected_index]);
+            }else {
+                remove_existing_highilights();
             }
         }
     }
@@ -148,6 +150,8 @@ private:
                 selected_piece = std::make_tuple(SIDE::WHITE, i);
                 return;
             }
+
+            std::get<1>(selected_piece) = -1;
         }
 
         for(int i=0; i<b_pieces.size(); i++) {
