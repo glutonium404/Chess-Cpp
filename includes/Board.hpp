@@ -14,7 +14,6 @@
 #include <array>
 #include <iostream>
 #include <memory>
-#include <tuple>
 
 struct Square {
 public:
@@ -116,19 +115,20 @@ private:
 
     sf::Mouse mouse;
 
-    // the index (int) being negative = no piece selected
-    std::tuple<SIDE, int> selected_piece = std::make_tuple(SIDE::BLACK, -1);
+    struct SelectedPiece {
+        bool is_any_selected = false;
+        SIDE side;
+        int index;
+    } selected_piece;
 
     void handle_click() {
         if(is_mouse_clicked()) {
             set_selected_piece();
 
-            int&  selected_index  = std::get<1>(selected_piece);
-            SIDE& selected_side   = std::get<0>(selected_piece);
-            auto& selected_vector = (selected_side == SIDE::WHITE) ? w_pieces : b_pieces;
+            auto& selected_vector = (selected_piece.side == SIDE::WHITE) ? w_pieces : b_pieces;
 
-            if(selected_index != -1) {
-                highlight_possible_moves(selected_vector[selected_index]);
+            if(selected_piece.is_any_selected) {
+                highlight_possible_moves(selected_vector[selected_piece.index]);
             }else {
                 remove_existing_highilights();
             }
@@ -147,23 +147,27 @@ private:
             if(!w_pieces[i]->is_alive) continue;
 
             if(w_pieces[i]->coordinate == clicked_coordinate) {
-                selected_piece = std::make_tuple(SIDE::WHITE, i);
+                selected_piece.is_any_selected = true;
+                selected_piece.side = SIDE::WHITE;
+                selected_piece.index = i;
                 return;
             }
 
-            std::get<1>(selected_piece) = -1;
+                selected_piece.is_any_selected = false;
         }
 
         for(int i=0; i<b_pieces.size(); i++) {
             if(!b_pieces[i]->is_alive) continue;
 
             if(b_pieces[i]->coordinate == clicked_coordinate) {
-                selected_piece = std::make_tuple(SIDE::BLACK, i);
+                selected_piece.is_any_selected = true;
+                selected_piece.side = SIDE::BLACK;
+                selected_piece.index = i;
                 return;
             }
         }
 
-        selected_piece = std::make_tuple(SIDE::BLACK, -1);
+        selected_piece.is_any_selected = false;
     }
 
     Coordinate get_clicked_coordinate() {
