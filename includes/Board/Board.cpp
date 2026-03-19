@@ -6,29 +6,13 @@
 #include "../Pieces/Knight/Knight.hpp"
 #include "../Pieces/Pawn/Pawn.hpp"
 
-void Board::Square::highlight() {
-    shape.setOutlineThickness(1.f);
-    shape.setOutlineColor(sf::Color::Black);
-    shape.setFillColor(Square::highlight_color);
-}
-
-void Board::Square::unhighlight() {
-    shape.setOutlineThickness(0.f);
-    shape.setOutlineColor(sf::Color::Transparent);
-    shape.setFillColor(
-        type == TYPE::LIGHT ? Square::light_color : Square::dark_color
-    );
-}
-
-Board::Board(float board_width, sf::RenderWindow& render_window)
-: board_width(board_width), render_window(render_window)
-{
+Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
     w_pieces.reserve(16);
     b_pieces.reserve(16);
 
     square_length = board_width / 8.0;
 
-    set_board_local_bound();
+    set_board_local_bound(board_width);
     set_squares_shapes();
     set_pieces();
 }
@@ -246,4 +230,22 @@ std::unique_ptr<Piece> Board::make_bishop(int row, int col, SIDE side) {
     return std::make_unique<Bishop>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
+}
+
+void Board::Square::highlight() {
+    shape.setOutlineThickness(1.f);
+    shape.setOutlineColor(sf::Color::Black);
+    shape.setFillColor(Square::highlight_color);
+}
+
+void Board::Square::unhighlight() {
+    shape.setOutlineThickness(0.f);
+    shape.setOutlineColor(sf::Color::Transparent);
+    shape.setFillColor(
+        type == TYPE::LIGHT ? Square::light_color : Square::dark_color
+    );
+}
+
+std::unique_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
+    return (side == SIDE::WHITE) ? board.w_pieces[index] : board.b_pieces[index];
 }

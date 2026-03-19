@@ -24,7 +24,6 @@ public:
         void unhighlight();
     };
 
-    float                               board_width;
     float                               square_length;
     sf::RenderWindow&                   render_window;
     sf::FloatRect                       board_local_bound;
@@ -48,6 +47,8 @@ private:
         bool is_any_selected = false;
         SIDE side;
         int index;
+
+        std::unique_ptr<Piece>& piece(Board& board) const;
     } selected_piece;
 
     void handle_click();
