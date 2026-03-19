@@ -46,6 +46,7 @@ void Board::draw() {
 
 void Board::highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
     remove_existing_highilights();
+    get_square(selected_piece.piece(*this)->coordinate).highlight();
 
     highlighted_coord = piece->get_possible_moves();
 
@@ -57,6 +58,8 @@ void Board::highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
 }
 
 void Board::remove_existing_highilights() {
+    get_square(selected_piece.piece(*this)->coordinate).unhighlight();
+
     for(auto& coord: highlighted_coord) {
         auto& highlighted_square = get_square(coord);
         highlighted_square.unhighlight();
@@ -65,19 +68,28 @@ void Board::remove_existing_highilights() {
 }
 
 void Board::handle_click(sf::Event& event) {
-    if(is_mouse_clicked(event)) {
-        if(piece_clicked()) {
-            highlight_possible_moves(selected_piece.piece(*this));
+    if(!is_mouse_clicked(event)) return;
 
-        }else {
-            if(selected_piece.is_any_selected) {
-                highlighted_square_clicked();
-            }
-
-            selected_piece.is_any_selected = false;
-            remove_existing_highilights();
-        }
+    // remove highilight from any previously selected piece square
+    // without this when we select a piece and then select another piece
+    // the square of the previously selected piece stays highlighted
+    if(selected_piece.is_any_selected) {
+        get_square(selected_piece.piece(*this)->coordinate).unhighlight();
     }
+
+    if(piece_clicked()) {
+        highlight_possible_moves(selected_piece.piece(*this));
+        return;
+    }
+
+    // empty square was clicked
+
+    if(selected_piece.is_any_selected) {
+        highlighted_square_clicked();
+    }
+
+    selected_piece.is_any_selected = false;
+    remove_existing_highilights();
 }
 
 bool Board::piece_clicked() {
