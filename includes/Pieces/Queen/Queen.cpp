@@ -11,7 +11,7 @@ Queen::Queen(
     side == Piece::COLOR::BLACK ? "assets/images/queen-b.png" : "assets/images/queen-w.png",
     coordinate,
     board_local_bound
-) {}
+), side(side) {}
 
 std::vector<Coordinate> Queen::get_possible_moves() {
     std::vector<Coordinate> possible_moves;

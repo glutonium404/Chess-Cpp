@@ -11,7 +11,7 @@ Bishop::Bishop(
     side == Piece::COLOR::BLACK ? "assets/images/bishop-b.png" : "assets/images/bishop-w.png",
     coordinate,
     board_local_bound
-) {}
+), side(side) {}
 
 std::vector<Coordinate> Bishop::get_possible_moves() {
     std::vector<Coordinate> possible_moves;

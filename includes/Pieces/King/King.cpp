@@ -11,7 +11,7 @@ King::King(
     side == Piece::COLOR::BLACK ? "assets/images/king-b.png" : "assets/images/king-w.png",
     coordinate,
     board_local_bound
-) {}
+), side(side) {}
 
 std::vector<Coordinate> King::get_possible_moves() {
     std::vector<Coordinate> possible_moves;

@@ -4,6 +4,8 @@
 
 class Rook : public Piece {
 public:
+    Piece::COLOR side;
+
     Rook(
         sf::RenderWindow&   render_window,
         Coordinate          coordinate,

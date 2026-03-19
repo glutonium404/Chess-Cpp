@@ -11,7 +11,7 @@ Knight::Knight(
     side == Piece::COLOR::BLACK ? "assets/images/knight-b.png" : "assets/images/knight-w.png",
     coordinate,
     board_local_bound
-) {}
+), side(side) {}
 
 std::vector<Coordinate> Knight::get_possible_moves() {
     std::vector<Coordinate> possible_moves;

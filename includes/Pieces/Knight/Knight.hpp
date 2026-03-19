@@ -4,6 +4,8 @@
 
 class Knight : public Piece {
 public:
+    Piece::COLOR            side;
+
     Knight(
         sf::RenderWindow&   render_window,
         Coordinate          coordinate,

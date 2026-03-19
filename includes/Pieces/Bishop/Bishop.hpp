@@ -5,6 +5,8 @@
 
 class Bishop : public Piece {
 public:
+    Piece::COLOR side;
+
     Bishop(
         sf::RenderWindow&   render_window,
         Coordinate          coordinate,

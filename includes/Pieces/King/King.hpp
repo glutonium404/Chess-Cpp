@@ -5,6 +5,8 @@
 
 class King : public Piece {
 public:
+    Piece::COLOR            side;
+
     King(
         sf::RenderWindow&   render_window,
         Coordinate          coordinate,

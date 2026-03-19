@@ -11,7 +11,7 @@ Pawn::Pawn(
     side == Piece::COLOR::BLACK ? "assets/images/pawn-b.png" : "assets/images/pawn-w.png",
     coordinate,
     board_local_bound
-)
+), side(side)
 {
     // direction dictates the forward direction of the merching pawn
     // when pawn moves forward, either it's row value increases or decreases based on it's forward direction
