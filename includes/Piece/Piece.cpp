@@ -7,6 +7,10 @@ bool Coordinate::operator==(const Coordinate& other) const {
     return other.col == col && other.row == row;
 }
 
+bool Coordinate::operator!=(const Coordinate& other) const {
+    return other.col != col || other.row != row;
+}
+
 Piece::~Piece() {}
 
 Piece::Piece(
@@ -30,6 +34,8 @@ Piece::Piece(
 void Piece::draw() {
     render_window.draw(sprite);
 }
+
+void Piece::set_coordinate(const Coordinate& coord) { set_coordinate(coord.row, coord.col); }
 
 void Piece::set_coordinate(int row, int col) {
     if (!is_coordinate_in_bound(row, col)) {

@@ -18,6 +18,15 @@ struct Coordinate {
 
     Coordinate(int row, int col);
     bool operator==(const Coordinate& other) const;
+    bool operator!=(const Coordinate& other) const;
+    std::string log() {
+        std::string msg = "{";
+        msg += row;
+        msg += " , ";
+        msg += col;
+        msg += "}";
+        return msg;
+    }
 };
 
 class Piece {
@@ -41,6 +50,7 @@ public:
 
     void draw();
     void set_coordinate(int row, int col);
+    void set_coordinate(const Coordinate& coord);
     void set_piece_scale(float scale);
 
 private:
