@@ -50,7 +50,7 @@ void Board::highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
     highlighted_coord = piece->get_possible_moves();
 
     for(auto& coord: highlighted_coord) {
-        auto& highlighted_square = squares[coord.row - 1][coord.col - 1];
+        auto& highlighted_square = get_square(coord);
         highlighted_square.highlight();
         render_window.draw(highlighted_square.shape);
     }
@@ -58,7 +58,7 @@ void Board::highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
 
 void Board::remove_existing_highilights() {
     for(auto& coord: highlighted_coord) {
-        auto& highlighted_square = squares[coord.row - 1][coord.col - 1];
+        auto& highlighted_square = get_square(coord);
         highlighted_square.unhighlight();
         render_window.draw(highlighted_square.shape);
     }
@@ -144,6 +144,14 @@ Coordinate Board::get_clicked_coordinate() {
     int col = static_cast<int>((mouse_pos.x - board_local_bound.left) / square_length) + 1;
 
     return Coordinate(row, col);
+}
+
+Board::Square& Board::get_square(int row, int col) {
+    return squares[row - 1][col - 1];
+}
+
+Board::Square& Board::get_square(const Coordinate& coord) {
+    return get_square(coord.row, coord.col);
 }
 
 void Board::set_board_local_bound(float& board_width) {
@@ -257,14 +265,12 @@ std::unique_ptr<Piece> Board::make_bishop(int row, int col, SIDE side) {
 }
 
 void Board::Square::highlight() {
-    shape.setOutlineThickness(1.f);
-    shape.setOutlineColor(sf::Color::Black);
-    shape.setFillColor(Square::highlight_color);
+    shape.setFillColor(
+        (type == TYPE::LIGHT) ? Square::light_highlight : Square::dark_highlight
+    );
 }
 
 void Board::Square::unhighlight() {
-    shape.setOutlineThickness(0.f);
-    shape.setOutlineColor(sf::Color::Transparent);
     shape.setFillColor(
         type == TYPE::LIGHT ? Square::light_color : Square::dark_color
     );
