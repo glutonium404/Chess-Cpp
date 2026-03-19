@@ -44,3 +44,6 @@ const std::vector<Coordinate> King::get_lookup_coordinates() const {
     return lookup_coordinates;
 }
 
+Piece::TYPE King::get_type() const {
+    return Piece::TYPE::KING;
+}

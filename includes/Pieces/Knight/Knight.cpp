@@ -44,3 +44,7 @@ const std::vector<Coordinate> Knight::get_lookup_coordinates() const {
 
     return lookup_coordinates;
 }
+
+Piece::TYPE Knight::get_type() const {
+    return Piece::TYPE::KNIGHT;
+}

@@ -53,3 +53,7 @@ const std::vector<Coordinate> Rook::get_lookup_coordinates() const {
 
     return lookup_coordinates;
 }
+
+Piece::TYPE Rook::get_type() const {
+    return Piece::TYPE::ROOK;
+}

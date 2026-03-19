@@ -73,3 +73,6 @@ const std::vector<Coordinate> Queen::get_lookup_coordinates() const {
     return lookup_coordinates;
 }
 
+Piece::TYPE Queen::get_type() const {
+    return Piece::TYPE::QUEEN;
+}

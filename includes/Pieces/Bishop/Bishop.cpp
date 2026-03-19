@@ -52,3 +52,7 @@ const std::vector<Coordinate> Bishop::get_lookup_coordinates() const {
 
     return lookup_coordinates;
 }
+
+Piece::TYPE Bishop::get_type() const {
+    return Piece::TYPE::BISHOP;
+}

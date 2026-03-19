@@ -30,3 +30,7 @@ std::vector<Coordinate> Pawn::get_possible_moves() {
 
     return possible_moves;
 }
+
+Piece::TYPE Pawn::get_type() const {
+    return Piece::TYPE::PAWN;
+}

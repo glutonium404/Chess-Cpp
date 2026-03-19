@@ -27,6 +27,7 @@ struct Coordinate {
 class Piece {
 public:
     enum class COLOR { BLACK, WHITE };
+    enum class TYPE  { KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN };
 
     sf::RenderWindow&   render_window;
     std::string         texture_path;
@@ -43,6 +44,7 @@ public:
     );
 
     virtual ~Piece();
+    virtual TYPE                    get_type() const = 0;
     virtual std::vector<Coordinate> get_possible_moves() = 0;
 
     void draw();
@@ -57,7 +59,6 @@ private:
     void setup_sprite();
 
 protected:
-
     bool is_coordinate_in_bound(const Coordinate& coordinate) const;
     bool is_coordinate_in_bound(const int row, const int col) const;
 };

@@ -12,6 +12,7 @@ public:
         Piece::COLOR         side
     );
 
+    TYPE                    get_type() const override;
     std::vector<Coordinate> get_possible_moves() override;
 
 private:
