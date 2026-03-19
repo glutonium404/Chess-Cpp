@@ -13,15 +13,16 @@
 class Board {
 public:
     struct Square {
-        enum class TYPE { LIGHT, DARK };
+        enum class COLOR { LIGHT, DARK, RED };
 
         inline static const sf::Color light_color      = sf::Color(235, 236, 208);
         inline static const sf::Color dark_color       = sf::Color(115, 149, 82);
 
         inline static const sf::Color light_highlight  = sf::Color(245, 246, 130);
         inline static const sf::Color dark_highlight   = sf::Color(185, 202, 67);
+        inline static const sf::Color red_highlight    = sf::Color(149, 82, 82);
 
-        TYPE type;
+        COLOR type;
         sf::RectangleShape shape;
 
         void highlight();
@@ -40,15 +41,15 @@ public:
     void draw();
 
 private:
-    SIDE                                    current_turn      = SIDE::WHITE;
+    Piece::COLOR                             current_turn      = Piece::COLOR::WHITE;
     sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
 
     struct SelectedPiece {
-        bool is_any_selected = false;
-        SIDE side;
-        int index;
+        bool        is_any_selected = false;
+        int         index;
+        Piece::COLOR side;
 
         std::unique_ptr<Piece>& piece(Board& board) const;
     } selected_piece;
@@ -67,10 +68,10 @@ private:
     Square&     get_square(int row, int col);
     Coordinate  get_clicked_coordinate();
 
-    std::unique_ptr<Piece> make_pawn(int row, int col, SIDE side);
-    std::unique_ptr<Piece> make_king(int row, int col, SIDE side);
-    std::unique_ptr<Piece> make_queen(int row, int col, SIDE side);
-    std::unique_ptr<Piece> make_rook(int row, int col, SIDE side);
-    std::unique_ptr<Piece> make_knight(int row, int col, SIDE side);
-    std::unique_ptr<Piece> make_bishop(int row, int col, SIDE side);
+    std::unique_ptr<Piece> make_pawn  (int row, int col, Piece::COLOR side);
+    std::unique_ptr<Piece> make_king  (int row, int col, Piece::COLOR side);
+    std::unique_ptr<Piece> make_queen (int row, int col, Piece::COLOR side);
+    std::unique_ptr<Piece> make_rook  (int row, int col, Piece::COLOR side);
+    std::unique_ptr<Piece> make_knight(int row, int col, Piece::COLOR side);
+    std::unique_ptr<Piece> make_bishop(int row, int col, Piece::COLOR side);
 };

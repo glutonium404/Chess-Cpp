@@ -9,7 +9,7 @@ public:
         sf::RenderWindow&   render_window,
         Coordinate          coordinate,
         sf::FloatRect       board_local_bound,
-        SIDE                side
+        Piece::COLOR         side
     );
 
     std::vector<Coordinate> get_possible_moves() override;

@@ -95,13 +95,13 @@ void Board::handle_click(sf::Event& event) {
 bool Board::piece_clicked() {
     auto clicked_coordinate = get_clicked_coordinate();
 
-    if(current_turn == SIDE::WHITE) {
+    if(current_turn == Piece::COLOR::WHITE) {
         for(int i=0; i<w_pieces.size(); i++) {
             if(!w_pieces[i]->is_alive) continue;
 
             if(w_pieces[i]->coordinate == clicked_coordinate) {
                 selected_piece.is_any_selected = true;
-                selected_piece.side  = SIDE::WHITE;
+                selected_piece.side  = Piece::COLOR::WHITE;
                 selected_piece.index = i;
 
                 return true;
@@ -113,7 +113,7 @@ bool Board::piece_clicked() {
 
             if(b_pieces[i]->coordinate == clicked_coordinate) {
                 selected_piece.is_any_selected = true;
-                selected_piece.side  = SIDE::BLACK;
+                selected_piece.side  = Piece::COLOR::BLACK;
                 selected_piece.index = i;
 
                 return true;
@@ -161,7 +161,7 @@ Coordinate Board::get_clicked_coordinate() {
 
 void Board::make_move(Coordinate& new_coordinate) {
     // toggle player
-    current_turn = (current_turn == SIDE::WHITE) ? SIDE::BLACK : SIDE::WHITE;
+    current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
 
     selected_piece.piece(*this)->set_coordinate(new_coordinate);
 }
@@ -204,7 +204,7 @@ void Board::set_squares_shapes() {
             squares[i][j].shape.setFillColor(color);
             squares[i][j].shape.setPosition(position);
 
-            squares[i][j].type = flag ? Square::TYPE::LIGHT : Square::TYPE::DARK;
+            squares[i][j].type = flag ? Square::COLOR::LIGHT : Square::COLOR::DARK;
 
             if(j != 7) { flag = !flag; }
         }
@@ -212,90 +212,98 @@ void Board::set_squares_shapes() {
 }
 
 void Board::set_pieces() {
-    b_pieces.push_back( make_rook   (1, 1, SIDE::BLACK) );
-    b_pieces.push_back( make_knight (1, 2, SIDE::BLACK) );
-    b_pieces.push_back( make_bishop (1, 3, SIDE::BLACK) );
-    b_pieces.push_back( make_queen  (1, 4, SIDE::BLACK) );
-    b_pieces.push_back( make_king   (1, 5, SIDE::BLACK) );
-    b_pieces.push_back( make_bishop (1, 6, SIDE::BLACK) );
-    b_pieces.push_back( make_knight (1, 7, SIDE::BLACK) );
-    b_pieces.push_back( make_rook   (1, 8, SIDE::BLACK) );
+    b_pieces.push_back( make_rook   (1, 1, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_knight (1, 2, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_bishop (1, 3, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_queen  (1, 4, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_king   (1, 5, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_bishop (1, 6, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_knight (1, 7, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_rook   (1, 8, Piece::COLOR::BLACK) );
 
-    b_pieces.push_back( make_pawn   (2, 1, SIDE::BLACK) );
-    b_pieces.push_back( make_pawn   (2, 2, SIDE::BLACK) );
-    b_pieces.push_back( make_pawn   (2, 3, SIDE::BLACK) );
-    b_pieces.push_back( make_pawn   (2, 4, SIDE::BLACK) );
-    b_pieces.push_back( make_pawn   (2, 5, SIDE::BLACK) );
-    b_pieces.push_back( make_pawn   (2, 6, SIDE::BLACK) );
-    b_pieces.push_back( make_pawn   (2, 7, SIDE::BLACK) );
-    b_pieces.push_back( make_pawn   (2, 8, SIDE::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 1, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 2, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 3, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 4, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 5, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 6, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 7, Piece::COLOR::BLACK) );
+    b_pieces.push_back( make_pawn   (2, 8, Piece::COLOR::BLACK) );
 
 
 
-    w_pieces.push_back( make_rook   (8, 1, SIDE::WHITE) );
-    w_pieces.push_back( make_knight (8, 2, SIDE::WHITE) );
-    w_pieces.push_back( make_bishop (8, 3, SIDE::WHITE) );
-    w_pieces.push_back( make_queen  (8, 4, SIDE::WHITE) );
-    w_pieces.push_back( make_king   (8, 5, SIDE::WHITE) );
-    w_pieces.push_back( make_bishop (8, 6, SIDE::WHITE) );
-    w_pieces.push_back( make_knight (8, 7, SIDE::WHITE) );
-    w_pieces.push_back( make_rook   (8, 8, SIDE::WHITE) );
+    w_pieces.push_back( make_rook   (8, 1, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_knight (8, 2, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_bishop (8, 3, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_queen  (8, 4, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_king   (8, 5, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_bishop (8, 6, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_knight (8, 7, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_rook   (8, 8, Piece::COLOR::WHITE) );
 
-    w_pieces.push_back( make_pawn(7, 1, SIDE::WHITE) );
-    w_pieces.push_back( make_pawn(7, 2, SIDE::WHITE) );
-    w_pieces.push_back( make_pawn(7, 3, SIDE::WHITE) );
-    w_pieces.push_back( make_pawn(7, 4, SIDE::WHITE) );
-    w_pieces.push_back( make_pawn(7, 5, SIDE::WHITE) );
-    w_pieces.push_back( make_pawn(7, 6, SIDE::WHITE) );
-    w_pieces.push_back( make_pawn(7, 7, SIDE::WHITE) );
-    w_pieces.push_back( make_pawn(7, 8, SIDE::WHITE) );
+    w_pieces.push_back( make_pawn(7, 1, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_pawn(7, 2, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_pawn(7, 3, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_pawn(7, 4, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_pawn(7, 5, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_pawn(7, 6, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_pawn(7, 7, Piece::COLOR::WHITE) );
+    w_pieces.push_back( make_pawn(7, 8, Piece::COLOR::WHITE) );
 }
 
-std::unique_ptr<Piece> Board::make_pawn(int row, int col, SIDE side) {
+std::unique_ptr<Piece> Board::make_pawn(int row, int col, Piece::COLOR side) {
     return std::make_unique<Pawn>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
 
-std::unique_ptr<Piece> Board::make_king(int row, int col, SIDE side) {
+std::unique_ptr<Piece> Board::make_king(int row, int col, Piece::COLOR side) {
     return std::make_unique<King>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
 
-std::unique_ptr<Piece> Board::make_queen(int row, int col, SIDE side) {
+std::unique_ptr<Piece> Board::make_queen(int row, int col, Piece::COLOR side) {
     return std::make_unique<Queen>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
-std::unique_ptr<Piece> Board::make_rook(int row, int col, SIDE side) {
+std::unique_ptr<Piece> Board::make_rook(int row, int col, Piece::COLOR side) {
     return std::make_unique<Rook>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
-std::unique_ptr<Piece> Board::make_knight(int row, int col, SIDE side) {
+std::unique_ptr<Piece> Board::make_knight(int row, int col, Piece::COLOR side) {
     return std::make_unique<Knight>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
-std::unique_ptr<Piece> Board::make_bishop(int row, int col, SIDE side) {
+std::unique_ptr<Piece> Board::make_bishop(int row, int col, Piece::COLOR side) {
     return std::make_unique<Bishop>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
 
 void Board::Square::highlight() {
-    shape.setFillColor(
-        (type == TYPE::LIGHT) ? Square::light_highlight : Square::dark_highlight
-    );
+    switch (type) {
+        case COLOR::LIGHT:
+            shape.setFillColor(Square::light_highlight);
+            break;
+        case COLOR::DARK:
+            shape.setFillColor(Square::dark_highlight);
+            break;
+        case COLOR::RED:
+            shape.setFillColor(Square::red_highlight);
+            break;
+    }
 }
 
 void Board::Square::unhighlight() {
     shape.setFillColor(
-        type == TYPE::LIGHT ? Square::light_color : Square::dark_color
+        type == COLOR::LIGHT ? Square::light_color : Square::dark_color
     );
 }
 
 std::unique_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
-    return (side == SIDE::WHITE) ? board.w_pieces[index] : board.b_pieces[index];
+    return (side == Piece::COLOR::WHITE) ? board.w_pieces[index] : board.b_pieces[index];
 }

@@ -4,11 +4,11 @@ King::King(
     sf::RenderWindow&   render_window,
     Coordinate          coordinate,
     sf::FloatRect       board_local_bound,
-    SIDE                side
+    Piece::COLOR        side
 )
     : Piece(
     render_window,
-    side == SIDE::BLACK ? "assets/images/king-b.png" : "assets/images/king-w.png",
+    side == Piece::COLOR::BLACK ? "assets/images/king-b.png" : "assets/images/king-w.png",
     coordinate,
     board_local_bound
 ) {}

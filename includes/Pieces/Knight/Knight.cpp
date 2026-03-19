@@ -4,11 +4,11 @@ Knight::Knight(
     sf::RenderWindow&   render_window,
     Coordinate          coordinate,
     sf::FloatRect       board_local_bound,
-    SIDE                side
+    Piece::COLOR         side
 )
     : Piece(
     render_window,
-    side == SIDE::BLACK ? "assets/images/knight-b.png" : "assets/images/knight-w.png",
+    side == Piece::COLOR::BLACK ? "assets/images/knight-b.png" : "assets/images/knight-w.png",
     coordinate,
     board_local_bound
 ) {}

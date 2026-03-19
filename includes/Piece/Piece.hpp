@@ -7,11 +7,6 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
-enum SIDE {
-    BLACK,
-    WHITE
-};
-
 struct Coordinate {
     int row = 0;
     int col = 0;
@@ -31,6 +26,8 @@ struct Coordinate {
 
 class Piece {
 public:
+    enum class COLOR { BLACK, WHITE };
+
     sf::RenderWindow&   render_window;
     std::string         texture_path;
     Coordinate          coordinate;
@@ -60,6 +57,7 @@ private:
     void setup_sprite();
 
 protected:
+
     bool is_coordinate_in_bound(const Coordinate& coordinate) const;
     bool is_coordinate_in_bound(const int row, const int col) const;
 };
