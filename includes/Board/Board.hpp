@@ -40,6 +40,7 @@ public:
     void draw();
 
 private:
+    SIDE                                    current_turn      = SIDE::WHITE;
     sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
@@ -61,6 +62,7 @@ private:
     void        set_pieces();
     void        highlight_possible_moves(const std::unique_ptr<Piece>& piece);
     void        remove_existing_highilights();
+    void        make_move(Coordinate& new_coordinate);
     Square&     get_square(const Coordinate& coordinate);
     Square&     get_square(int row, int col);
     Coordinate  get_clicked_coordinate();

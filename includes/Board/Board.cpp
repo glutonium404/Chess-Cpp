@@ -95,27 +95,29 @@ void Board::handle_click(sf::Event& event) {
 bool Board::piece_clicked() {
     auto clicked_coordinate = get_clicked_coordinate();
 
-    for(int i=0; i<w_pieces.size(); i++) {
-        if(!w_pieces[i]->is_alive) continue;
+    if(current_turn == SIDE::WHITE) {
+        for(int i=0; i<w_pieces.size(); i++) {
+            if(!w_pieces[i]->is_alive) continue;
 
-        if(w_pieces[i]->coordinate == clicked_coordinate) {
-            selected_piece.is_any_selected = true;
-            selected_piece.side  = SIDE::WHITE;
-            selected_piece.index = i;
+            if(w_pieces[i]->coordinate == clicked_coordinate) {
+                selected_piece.is_any_selected = true;
+                selected_piece.side  = SIDE::WHITE;
+                selected_piece.index = i;
 
-            return true;
+                return true;
+            }
         }
-    }
+    } else {
+        for(int i=0; i<b_pieces.size(); i++) {
+            if(!b_pieces[i]->is_alive) continue;
 
-    for(int i=0; i<b_pieces.size(); i++) {
-        if(!b_pieces[i]->is_alive) continue;
+            if(b_pieces[i]->coordinate == clicked_coordinate) {
+                selected_piece.is_any_selected = true;
+                selected_piece.side  = SIDE::BLACK;
+                selected_piece.index = i;
 
-        if(b_pieces[i]->coordinate == clicked_coordinate) {
-            selected_piece.is_any_selected = true;
-            selected_piece.side  = SIDE::BLACK;
-            selected_piece.index = i;
-
-            return true;
+                return true;
+            }
         }
     }
 
@@ -129,8 +131,7 @@ void Board::highlighted_square_clicked() {
 
     for(auto& coord: highlighted_coord) {
         if(coord != clicked_coordinate) continue;
-
-        selected_piece.piece(*this)->set_coordinate(coord);
+        make_move(coord);
         return;
     }
 }
@@ -156,6 +157,13 @@ Coordinate Board::get_clicked_coordinate() {
     int col = static_cast<int>((mouse_pos.x - board_local_bound.left) / square_length) + 1;
 
     return Coordinate(row, col);
+}
+
+void Board::make_move(Coordinate& new_coordinate) {
+    // toggle player
+    current_turn = (current_turn == SIDE::WHITE) ? SIDE::BLACK : SIDE::WHITE;
+
+    selected_piece.piece(*this)->set_coordinate(new_coordinate);
 }
 
 Board::Square& Board::get_square(int row, int col) {
