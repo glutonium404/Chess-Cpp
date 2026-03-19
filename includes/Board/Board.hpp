@@ -5,8 +5,10 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Event.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <array>
+#include <memory>
 
 class Board {
 public:
@@ -32,10 +34,9 @@ public:
 
     Board(float board_width, sf::RenderWindow& render_window);
 
+    void handle_event(sf::Event& event);
     void draw();
-
     void highlight_possible_moves(const std::unique_ptr<Piece>& piece);
-
     void remove_existing_highilights();
 
 private:
@@ -51,11 +52,12 @@ private:
         std::unique_ptr<Piece>& piece(Board& board) const;
     } selected_piece;
 
-    void handle_click();
-    bool is_mouse_clicked() const;
-    void set_selected_piece();
+    void handle_click(sf::Event& event);
+    bool is_mouse_clicked(sf::Event& event) const;
+    bool piece_clicked();
+    void highlighted_square_clicked();
     Coordinate get_clicked_coordinate();
-    void set_board_local_bound();
+    void set_board_local_bound(float& board_width);
     void set_squares_shapes();
     void set_pieces();
 

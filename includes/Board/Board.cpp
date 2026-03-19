@@ -5,6 +5,9 @@
 #include "../Pieces/Bishop/Bishop.hpp"
 #include "../Pieces/Knight/Knight.hpp"
 #include "../Pieces/Pawn/Pawn.hpp"
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Event.hpp>
+#include <memory>
 
 Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
     w_pieces.reserve(16);
@@ -17,9 +20,11 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
     set_pieces();
 }
 
-void Board::draw() {
-    handle_click();
+void Board::handle_event(sf::Event& event) {
+    handle_click(event);
+}
 
+void Board::draw() {
     for(auto& square_array: squares) {
         for(auto& square: square_array) {
             render_window.draw(square.shape);
@@ -59,37 +64,34 @@ void Board::remove_existing_highilights() {
     }
 }
 
-void Board::handle_click() {
-    if(is_mouse_clicked()) {
-        set_selected_piece();
+void Board::handle_click(sf::Event& event) {
+    if(is_mouse_clicked(event)) {
+        if(piece_clicked()) {
+            highlight_possible_moves(selected_piece.piece(*this));
 
-        auto& selected_piece_set = (selected_piece.side == SIDE::WHITE) ? w_pieces : b_pieces;
-
-        if(selected_piece.is_any_selected) {
-            highlight_possible_moves(selected_piece_set[selected_piece.index]);
         }else {
+            if(selected_piece.is_any_selected) {
+                highlighted_square_clicked();
+            }
+
+            selected_piece.is_any_selected = false;
             remove_existing_highilights();
         }
     }
 }
 
-bool Board::is_mouse_clicked() const {
-    auto pos = mouse.getPosition(render_window);
-    return mouse.isButtonPressed(mouse.Left) && board_local_bound.contains(pos.x, pos.y);
-}
-
-void Board::set_selected_piece() {
+bool Board::piece_clicked() {
     auto clicked_coordinate = get_clicked_coordinate();
 
     for(int i=0; i<w_pieces.size(); i++) {
         if(!w_pieces[i]->is_alive) continue;
 
         if(w_pieces[i]->coordinate == clicked_coordinate) {
-            selected_piece.is_any_selected  = true;
-            selected_piece.side             = SIDE::WHITE;
-            selected_piece.index            = i;
+            selected_piece.is_any_selected = true;
+            selected_piece.side  = SIDE::WHITE;
+            selected_piece.index = i;
 
-            return;
+            return true;
         }
     }
 
@@ -97,15 +99,37 @@ void Board::set_selected_piece() {
         if(!b_pieces[i]->is_alive) continue;
 
         if(b_pieces[i]->coordinate == clicked_coordinate) {
-            selected_piece.is_any_selected  = true;
-            selected_piece.side             = SIDE::BLACK;
-            selected_piece.index            = i;
+            selected_piece.is_any_selected = true;
+            selected_piece.side  = SIDE::BLACK;
+            selected_piece.index = i;
 
-            return;
+            return true;
         }
     }
 
-    selected_piece.is_any_selected = false;
+    // we are setting is_any_selected to false in handle_click
+    // because we need this variable to check if any highlighted square is clicked
+    return false;
+}
+
+void Board::highlighted_square_clicked() {
+    auto clicked_coordinate = get_clicked_coordinate();
+
+    for(auto& coord: highlighted_coord) {
+        if(coord != clicked_coordinate) continue;
+
+        selected_piece.piece(*this)->set_coordinate(coord);
+        return;
+    }
+}
+
+bool Board::is_mouse_clicked(sf::Event& event) const {
+    if(event.type != sf::Event::MouseButtonPressed || event.mouseButton.button != sf::Mouse::Left) return false;
+
+    return board_local_bound.contains(
+        static_cast<float>(event.mouseButton.x),
+        static_cast<float>(event.mouseButton.y)
+    );
 }
 
 Coordinate Board::get_clicked_coordinate() {
@@ -122,7 +146,7 @@ Coordinate Board::get_clicked_coordinate() {
     return Coordinate(row, col);
 }
 
-void Board::set_board_local_bound() {
+void Board::set_board_local_bound(float& board_width) {
     sf::Vector2u window_dim = render_window.getSize();
 
     float offset_x = (window_dim.x - board_width) / 2.0;
