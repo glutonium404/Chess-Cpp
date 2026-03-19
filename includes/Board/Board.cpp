@@ -18,6 +18,7 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
     set_board_local_bound(board_width);
     set_squares_shapes();
     set_pieces();
+    add_pieces_to_board();
 }
 
 void Board::handle_event(sf::Event& event) {
@@ -27,24 +28,12 @@ void Board::handle_event(sf::Event& event) {
 void Board::draw() {
     for(auto& square_array: squares) {
         for(auto& square: square_array) {
-            render_window.draw(square.shape);
-        }
-    }
-
-    for(int i=0; i<b_pieces.size(); i++) {
-        if(b_pieces[i]->is_alive) {
-            b_pieces[i]->draw();
-        }
-    }
-
-    for(int i=0; i<w_pieces.size(); i++) {
-        if(w_pieces[i]->is_alive) {
-            w_pieces[i]->draw();
+            square.draw(*this);
         }
     }
 }
 
-void Board::highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
+void Board::highlight_possible_moves(const std::shared_ptr<Piece>& piece) {
     remove_existing_highilights();
     get_square(selected_piece.piece(*this)->coordinate).highlight();
 
@@ -131,7 +120,11 @@ void Board::highlighted_square_clicked() {
 
     for(auto& coord: highlighted_coord) {
         if(coord != clicked_coordinate) continue;
+
         make_move(coord);
+
+        // toggle player
+        current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
         return;
     }
 }
@@ -160,10 +153,16 @@ Coordinate Board::get_clicked_coordinate() {
 }
 
 void Board::make_move(Coordinate& new_coordinate) {
-    // toggle player
-    current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
+    auto& moving_piece = selected_piece.piece(*this);
+    auto& curr_coord = moving_piece->coordinate;
 
-    selected_piece.piece(*this)->set_coordinate(new_coordinate);
+    auto& old_square = get_square(curr_coord);
+    auto& new_square = get_square(new_coordinate);
+
+    old_square.piece = nullptr;
+    new_square.piece = moving_piece;
+
+    moving_piece->set_coordinate(new_coordinate);
 }
 
 Board::Square& Board::get_square(int row, int col) {
@@ -251,35 +250,46 @@ void Board::set_pieces() {
     w_pieces.push_back( make_pawn(7, 8, Piece::COLOR::WHITE) );
 }
 
-std::unique_ptr<Piece> Board::make_pawn(int row, int col, Piece::COLOR side) {
-    return std::make_unique<Pawn>(
+void Board::add_pieces_to_board() {
+    for(auto& piece: w_pieces) {
+        auto& coord = piece->coordinate;
+        squares[coord.row - 1][coord.col - 1].piece = piece;
+    }
+    for(auto& piece: b_pieces) {
+        auto& coord = piece->coordinate;
+        squares[coord.row - 1][coord.col - 1].piece = piece;
+    }
+}
+
+std::shared_ptr<Piece> Board::make_pawn(int row, int col, Piece::COLOR side) {
+    return std::make_shared<Pawn>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
 
-std::unique_ptr<Piece> Board::make_king(int row, int col, Piece::COLOR side) {
-    return std::make_unique<King>(
+std::shared_ptr<Piece> Board::make_king(int row, int col, Piece::COLOR side) {
+    return std::make_shared<King>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
 
-std::unique_ptr<Piece> Board::make_queen(int row, int col, Piece::COLOR side) {
-    return std::make_unique<Queen>(
+std::shared_ptr<Piece> Board::make_queen(int row, int col, Piece::COLOR side) {
+    return std::make_shared<Queen>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
-std::unique_ptr<Piece> Board::make_rook(int row, int col, Piece::COLOR side) {
-    return std::make_unique<Rook>(
+std::shared_ptr<Piece> Board::make_rook(int row, int col, Piece::COLOR side) {
+    return std::make_shared<Rook>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
-std::unique_ptr<Piece> Board::make_knight(int row, int col, Piece::COLOR side) {
-    return std::make_unique<Knight>(
+std::shared_ptr<Piece> Board::make_knight(int row, int col, Piece::COLOR side) {
+    return std::make_shared<Knight>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
-std::unique_ptr<Piece> Board::make_bishop(int row, int col, Piece::COLOR side) {
-    return std::make_unique<Bishop>(
+std::shared_ptr<Piece> Board::make_bishop(int row, int col, Piece::COLOR side) {
+    return std::make_shared<Bishop>(
         render_window, Coordinate(row, col), board_local_bound, side
     );
 }
@@ -304,6 +314,11 @@ void Board::Square::unhighlight() {
     );
 }
 
-std::unique_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
+void Board::Square::draw(const Board& board) {
+    board.render_window.draw(shape);
+    if(piece && piece->is_alive) piece->draw();
+}
+
+std::shared_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
     return (side == Piece::COLOR::WHITE) ? board.w_pieces[index] : board.b_pieces[index];
 }

@@ -22,18 +22,20 @@ public:
         inline static const sf::Color dark_highlight   = sf::Color(185, 202, 67);
         inline static const sf::Color red_highlight    = sf::Color(149, 82, 82);
 
-        COLOR type;
-        sf::RectangleShape shape;
+        COLOR                   type;
+        sf::RectangleShape      shape;
+        std::shared_ptr<Piece>  piece = nullptr;
 
         void highlight();
         void unhighlight();
+        void draw(const Board& board);
     };
 
     float                               square_length;
     sf::RenderWindow&                   render_window;
     sf::FloatRect                       board_local_bound;
-    std::vector<std::unique_ptr<Piece>> b_pieces;
-    std::vector<std::unique_ptr<Piece>> w_pieces;
+    std::vector<std::shared_ptr<Piece>> b_pieces;
+    std::vector<std::shared_ptr<Piece>> w_pieces;
 
     Board(float board_width, sf::RenderWindow& render_window);
 
@@ -41,7 +43,7 @@ public:
     void draw();
 
 private:
-    Piece::COLOR                             current_turn      = Piece::COLOR::WHITE;
+    Piece::COLOR                            current_turn      = Piece::COLOR::WHITE;
     sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
@@ -51,7 +53,7 @@ private:
         int         index;
         Piece::COLOR side;
 
-        std::unique_ptr<Piece>& piece(Board& board) const;
+        std::shared_ptr<Piece>& piece(Board& board) const;
     } selected_piece;
 
     bool        is_mouse_clicked(sf::Event& event) const;
@@ -61,17 +63,18 @@ private:
     void        set_board_local_bound(float& board_width);
     void        set_squares_shapes();
     void        set_pieces();
-    void        highlight_possible_moves(const std::unique_ptr<Piece>& piece);
+    void        add_pieces_to_board();
+    void        highlight_possible_moves(const std::shared_ptr<Piece>& piece);
     void        remove_existing_highilights();
     void        make_move(Coordinate& new_coordinate);
     Square&     get_square(const Coordinate& coordinate);
     Square&     get_square(int row, int col);
     Coordinate  get_clicked_coordinate();
 
-    std::unique_ptr<Piece> make_pawn  (int row, int col, Piece::COLOR side);
-    std::unique_ptr<Piece> make_king  (int row, int col, Piece::COLOR side);
-    std::unique_ptr<Piece> make_queen (int row, int col, Piece::COLOR side);
-    std::unique_ptr<Piece> make_rook  (int row, int col, Piece::COLOR side);
-    std::unique_ptr<Piece> make_knight(int row, int col, Piece::COLOR side);
-    std::unique_ptr<Piece> make_bishop(int row, int col, Piece::COLOR side);
+    std::shared_ptr<Piece> make_pawn  (int row, int col, Piece::COLOR side);
+    std::shared_ptr<Piece> make_king  (int row, int col, Piece::COLOR side);
+    std::shared_ptr<Piece> make_queen (int row, int col, Piece::COLOR side);
+    std::shared_ptr<Piece> make_rook  (int row, int col, Piece::COLOR side);
+    std::shared_ptr<Piece> make_knight(int row, int col, Piece::COLOR side);
+    std::shared_ptr<Piece> make_bishop(int row, int col, Piece::COLOR side);
 };
