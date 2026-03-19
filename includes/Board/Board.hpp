@@ -13,7 +13,7 @@
 class Board {
 public:
     struct Square {
-        enum class COLOR { LIGHT, DARK, RED };
+        enum class COLOR { LIGHT, DARK };
 
         inline static const sf::Color light_color      = sf::Color(235, 236, 208);
         inline static const sf::Color dark_color       = sf::Color(115, 149, 82);
@@ -22,13 +22,20 @@ public:
         inline static const sf::Color dark_highlight   = sf::Color(185, 202, 67);
         inline static const sf::Color red_highlight    = sf::Color(149, 82, 82);
 
-        COLOR type;
+        COLOR       type;
+        Coordinate  coordinate = Coordinate(0, 0);
+
         sf::RectangleShape shape;
 
-        void highlight();
-        void unhighlight();
+        bool is_red() const;
+
+        void highlight(const Board& board);
+        void highlight(const sf::Color& color);
+
+        void unhighlight(const Board& board);
     };
 
+    bool                                is_there_check      = false;
     float                               square_length;
     sf::RenderWindow&                   render_window;
     sf::FloatRect                       board_local_bound;
@@ -41,10 +48,13 @@ public:
     void draw();
 
 private:
-    Piece::COLOR                             current_turn      = Piece::COLOR::WHITE;
+    Piece::COLOR                            current_turn = Piece::COLOR::WHITE;
+
     sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
+
+    Coordinate current_check_coord = Coordinate(-1, -1);
 
     struct SelectedPiece {
         bool        is_any_selected = false;
@@ -54,12 +64,13 @@ private:
         std::unique_ptr<Piece>& piece(Board& board) const;
     } selected_piece;
 
+    int         is_check() const;
     bool        is_mouse_clicked(sf::Event& event) const;
     bool        piece_clicked();
     void        handle_click(sf::Event& event);
     void        highlighted_square_clicked();
     void        set_board_local_bound(float& board_width);
-    void        set_squares_shapes();
+    void        set_squares();
     void        set_pieces();
     void        highlight_possible_moves(const std::unique_ptr<Piece>& piece);
     void        remove_existing_highilights();
@@ -74,4 +85,6 @@ private:
     std::unique_ptr<Piece> make_rook  (int row, int col, Piece::COLOR side);
     std::unique_ptr<Piece> make_knight(int row, int col, Piece::COLOR side);
     std::unique_ptr<Piece> make_bishop(int row, int col, Piece::COLOR side);
+
+    const std::unique_ptr<Piece>& get_player_king() const;
 };

@@ -7,6 +7,7 @@
 #include "../Pieces/Pawn/Pawn.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
+#include <algorithm>
 #include <memory>
 
 Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
@@ -16,7 +17,7 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
     square_length = board_width / 8.0;
 
     set_board_local_bound(board_width);
-    set_squares_shapes();
+    set_squares();
     set_pieces();
 }
 
@@ -46,23 +47,24 @@ void Board::draw() {
 
 void Board::highlight_possible_moves(const std::unique_ptr<Piece>& piece) {
     remove_existing_highilights();
-    get_square(selected_piece.piece(*this)->coordinate).highlight();
+
+    get_square(selected_piece.piece(*this)->coordinate).highlight(*this);
 
     highlighted_coord = piece->get_possible_moves();
 
     for(auto& coord: highlighted_coord) {
         auto& highlighted_square = get_square(coord);
-        highlighted_square.highlight();
+        highlighted_square.highlight(*this);
         render_window.draw(highlighted_square.shape);
     }
 }
 
 void Board::remove_existing_highilights() {
-    get_square(selected_piece.piece(*this)->coordinate).unhighlight();
+    get_square(selected_piece.piece(*this)->coordinate).unhighlight(*this);
 
     for(auto& coord: highlighted_coord) {
         auto& highlighted_square = get_square(coord);
-        highlighted_square.unhighlight();
+        highlighted_square.unhighlight(*this);
         render_window.draw(highlighted_square.shape);
     }
 }
@@ -74,7 +76,7 @@ void Board::handle_click(sf::Event& event) {
     // without this when we select a piece and then select another piece
     // the square of the previously selected piece stays highlighted
     if(selected_piece.is_any_selected) {
-        get_square(selected_piece.piece(*this)->coordinate).unhighlight();
+        get_square(selected_piece.piece(*this)->coordinate).unhighlight(*this);
     }
 
     if(piece_clicked()) {
@@ -131,7 +133,25 @@ void Board::highlighted_square_clicked() {
 
     for(auto& coord: highlighted_coord) {
         if(coord != clicked_coordinate) continue;
+
+        get_square(selected_piece.piece(*this)->coordinate).unhighlight(*this);
+
         make_move(coord);
+
+        // --- NEW CHECK LOGIC ---
+        // 1. If there was a red square, clear it immediately
+        if (is_there_check) {
+            get_square(current_check_coord).unhighlight(*this);
+            is_there_check = false;
+        }
+
+        // 2. See if the move put the NEW player in check
+        if(is_check() > 0) { // Note: is_check() returns an int in your code!
+            is_there_check = true;
+            current_check_coord = get_player_king()->coordinate;
+            get_square(current_check_coord).highlight(Square::red_highlight);
+        }
+
         return;
     }
 }
@@ -166,6 +186,23 @@ void Board::make_move(Coordinate& new_coordinate) {
     selected_piece.piece(*this)->set_coordinate(new_coordinate);
 }
 
+int Board::is_check() const {
+    auto& opponent_pieces = (current_turn == Piece::COLOR::WHITE) ? b_pieces : w_pieces;
+    int count = 0;
+
+    for(auto& oppo_piece: opponent_pieces) {
+        if(!oppo_piece->is_alive) continue;
+
+        auto possible_moves = oppo_piece->get_possible_moves();
+        auto it = std::find(possible_moves.begin(), possible_moves.end(), get_player_king()->coordinate);
+
+        if(it != possible_moves.end())
+            count++;
+    }
+
+    return count;
+}
+
 Board::Square& Board::get_square(int row, int col) {
     return squares[row - 1][col - 1];
 }
@@ -186,7 +223,7 @@ void Board::set_board_local_bound(float& board_width) {
     board_local_bound.height    = square_length * 8.f;
 }
 
-void Board::set_squares_shapes() {
+void Board::set_squares() {
     bool flag = true;
 
     for(int i=0; i<8; i++) {
@@ -205,6 +242,8 @@ void Board::set_squares_shapes() {
             squares[i][j].shape.setPosition(position);
 
             squares[i][j].type = flag ? Square::COLOR::LIGHT : Square::COLOR::DARK;
+
+            squares[i][j].coordinate = Coordinate(i+1, j+1);
 
             if(j != 7) { flag = !flag; }
         }
@@ -284,24 +323,31 @@ std::unique_ptr<Piece> Board::make_bishop(int row, int col, Piece::COLOR side) {
     );
 }
 
-void Board::Square::highlight() {
-    switch (type) {
-        case COLOR::LIGHT:
-            shape.setFillColor(Square::light_highlight);
-            break;
-        case COLOR::DARK:
-            shape.setFillColor(Square::dark_highlight);
-            break;
-        case COLOR::RED:
-            shape.setFillColor(Square::red_highlight);
-            break;
-    }
+
+const std::unique_ptr<Piece>& Board::get_player_king() const {
+    // in when pushing pieces into the vector
+    // we are always pushing the king at index 4
+    return (current_turn == Piece::COLOR::WHITE) ? w_pieces[4] : b_pieces[4];
 }
 
-void Board::Square::unhighlight() {
+void Board::Square::highlight(const sf::Color& color) {
+    shape.setFillColor(color);
+}
+
+void Board::Square::highlight(const Board& board) {
+    shape.setFillColor(
+        type == COLOR::LIGHT ? Square::light_highlight : Square::dark_highlight
+    );
+}
+
+void Board::Square::unhighlight(const Board& board) {
     shape.setFillColor(
         type == COLOR::LIGHT ? Square::light_color : Square::dark_color
     );
+}
+
+bool Board::Square::is_red() const {
+    return shape.getFillColor() == Square::red_highlight;
 }
 
 std::unique_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
