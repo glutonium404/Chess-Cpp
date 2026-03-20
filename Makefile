@@ -1,21 +1,38 @@
 CXX = g++
-# -Wall: show all warnings | -std=c++17: use modern C++
-CXXFLAGS = -Wall -std=c++17
+CXXFLAGS = -std=c++17 -Wall -MMD -MP
+BUILD_DIR = build
 
-# Search for all .cpp files recursively
+# 1. Find all .cpp files
 SRCS = main.cpp $(shell find includes -name "*.cpp")
 
-# List all directories containing headers for the -I flag
-INC_DIRS = -Iincludes/Board -Iincludes/Piece $(shell find includes/Pieces -type d | sed 's/^/-I/')
+# 2. Transform SRCS into OBJS inside the build directory
+# Example: includes/Board/Board.cpp -> build/includes/Board/Board.o
+OBJS = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 
-# SFML Libraries
+# SFML and Include paths
+INC_DIRS = -Iincludes -Iincludes/Piece -Iincludes/Board $(shell find includes/Pieces -type d | sed 's/^/-I/')
 LIBS = -lsfml-graphics -lsfml-window -lsfml-system
 
-# Target name
 TARGET = chess_game
 
-all:
-	$(CXX) $(CXXFLAGS) $(SRCS) $(INC_DIRS) $(LIBS) -o $(TARGET)
+all: $(TARGET)
+
+# Linking stage
+$(TARGET): $(OBJS)
+	@echo "Linking $(TARGET)..."
+	$(CXX) $(OBJS) -o $(TARGET) $(LIBS)
+
+# Compilation stage
+$(BUILD_DIR)/%.o: %.cpp
+	@echo "Compiling $<..."
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INC_DIRS) -c $< -o $@
+
+# Include the .d files for dependency tracking
+-include $(OBJS:.o=.d)
 
 clean:
-	rm -f $(TARGET)
+	@echo "Cleaning up..."
+	rm -rf $(BUILD_DIR) $(TARGET)
+
+.PHONY: all clean
