@@ -19,7 +19,7 @@ std::vector<Coordinate> King::get_possible_moves() {
     possible_moves.reserve(8);
 
     for(auto& coord: get_lookup_coordinates()) {
-        if(!is_coordinate_in_bound(coord)) continue;
+        if(!coord.is_valid()) continue;
 
         possible_moves.push_back(coord);
     }

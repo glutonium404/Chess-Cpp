@@ -40,7 +40,7 @@ void Piece::draw() {
 void Piece::set_coordinate(const Coordinate& coord) { set_coordinate(coord.row, coord.col); }
 
 void Piece::set_coordinate(int row, int col) {
-    if (!is_coordinate_in_bound(row, col)) {
+    if (!Coordinate::is_valid(row, col)) {
         std::cerr << "Error: Invalid coordinate {" << row << ", " << col << "}" << std::endl;
         return;
     }
@@ -71,12 +71,4 @@ void Piece::setup_sprite() {
 
     sf::FloatRect local_bound = sprite.getLocalBounds();
     sprite.setOrigin(local_bound.width / 2.f, local_bound.height / 2.f);
-}
-
-bool Piece::is_coordinate_in_bound(const Coordinate& coordinate) const {
-    return !(coordinate.row < 1 || coordinate.row > 8 || coordinate.col < 1 || coordinate.col > 8);
-}
-
-bool Piece::is_coordinate_in_bound(const int row, const int col) const {
-    return !(row < 1 || row > 8 || col < 1 || col > 8);
 }

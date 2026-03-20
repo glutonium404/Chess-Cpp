@@ -52,22 +52,22 @@ const std::vector<Coordinate> Queen::get_lookup_coordinates() const {
     }
 
     // all top-left squares
-    for(col = coordinate.col - 1, row = coordinate.row - 1; is_coordinate_in_bound(row, col); col--, row--) {
+    for(col = coordinate.col - 1, row = coordinate.row - 1; Coordinate::is_valid(row, col); col--, row--) {
         lookup_coordinates.push_back({ row, col });
     }
 
     // all top-right squares
-    for(col = coordinate.col + 1, row = coordinate.row - 1; is_coordinate_in_bound(row, col); col++, row--) {
+    for(col = coordinate.col + 1, row = coordinate.row - 1; Coordinate::is_valid(row, col); col++, row--) {
         lookup_coordinates.push_back({ row, col });
     }
 
     // all bottom-right squares
-    for(col = coordinate.col + 1, row = coordinate.row + 1; is_coordinate_in_bound(row, col); col++, row++) {
+    for(col = coordinate.col + 1, row = coordinate.row + 1; Coordinate::is_valid(row, col); col++, row++) {
         lookup_coordinates.push_back({ row, col });
     }
 
     // all bottom-left squares
-    for(col = coordinate.col - 1, row = coordinate.row + 1; is_coordinate_in_bound(row, col); col--, row++) {
+    for(col = coordinate.col - 1, row = coordinate.row + 1; Coordinate::is_valid(row, col); col--, row++) {
         lookup_coordinates.push_back({ row, col });
     }
 
