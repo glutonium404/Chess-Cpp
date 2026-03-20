@@ -22,7 +22,8 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
 }
 
 void Board::handle_event(sf::Event& event) {
-    handle_click(event);
+    if(is_mouse_clicked(event))
+        handle_click(event);
 }
 
 void Board::draw() {
@@ -34,31 +35,28 @@ void Board::draw() {
 }
 
 void Board::highlight_possible_moves(const std::shared_ptr<Piece>& piece) {
+    // if previously any player piece was selected
+    // we need to remove the highlighted squares for that piece
     remove_existing_highilights();
+
     get_square(selected_piece.piece(*this)->coordinate).highlight();
 
     highlighted_coord = piece->get_possible_moves();
 
     for(auto& coord: highlighted_coord) {
-        auto& highlighted_square = get_square(coord);
-        highlighted_square.highlight();
-        render_window.draw(highlighted_square.shape);
+        get_square(coord).highlight();
     }
 }
 
 void Board::remove_existing_highilights() {
-    get_square(selected_piece.piece(*this)->coordinate).unhighlight();
-
     for(auto& coord: highlighted_coord) {
-        auto& highlighted_square = get_square(coord);
-        highlighted_square.unhighlight();
-        render_window.draw(highlighted_square.shape);
+        get_square(coord).unhighlight();
     }
+
+    highlighted_coord.clear();
 }
 
 void Board::handle_click(sf::Event& event) {
-    if(!is_mouse_clicked(event)) return;
-
     // remove highilight from any previously selected piece square
     // without this when we select a piece and then select another piece
     // the square of the previously selected piece stays highlighted
@@ -66,48 +64,31 @@ void Board::handle_click(sf::Event& event) {
         get_square(selected_piece.piece(*this)->coordinate).unhighlight();
     }
 
+    // checks if any player piece is clicked
     if(piece_clicked()) {
         highlight_possible_moves(selected_piece.piece(*this));
         return;
     }
 
-    // empty square was clicked
-
+    // if any piece was previously selected
+    // it checks if any highilighted square was clicked and makes the move if so
     if(selected_piece.is_any_selected) {
         highlighted_square_clicked();
     }
 
+    // no pieces were selected
     selected_piece.is_any_selected = false;
     remove_existing_highilights();
 }
 
 bool Board::piece_clicked() {
     auto clicked_coordinate = get_clicked_coordinate();
+    auto& sq = get_square(clicked_coordinate);
 
-    if(current_turn == Piece::COLOR::WHITE) {
-        for(int i=0; i<w_pieces.size(); i++) {
-            if(!w_pieces[i]->is_alive) continue;
-
-            if(w_pieces[i]->coordinate == clicked_coordinate) {
-                selected_piece.is_any_selected = true;
-                selected_piece.color  = Piece::COLOR::WHITE;
-                selected_piece.index = i;
-
-                return true;
-            }
-        }
-    } else {
-        for(int i=0; i<b_pieces.size(); i++) {
-            if(!b_pieces[i]->is_alive) continue;
-
-            if(b_pieces[i]->coordinate == clicked_coordinate) {
-                selected_piece.is_any_selected = true;
-                selected_piece.color  = Piece::COLOR::BLACK;
-                selected_piece.index = i;
-
-                return true;
-            }
-        }
+    if(sq.piece && sq.piece->is_alive && sq.piece->color == current_turn) {
+        selected_piece.is_any_selected = true;
+        selected_piece.coordinate = sq.piece->coordinate;
+        return true;
     }
 
     // we are setting is_any_selected to false in handle_click
@@ -153,16 +134,21 @@ Coordinate Board::get_clicked_coordinate() {
 }
 
 void Board::make_move(Coordinate& new_coordinate) {
-    auto& moving_piece = selected_piece.piece(*this);
+    if(!selected_piece.is_any_selected) return;
+
+    auto moving_piece = selected_piece.piece(*this);
     auto& curr_coord = moving_piece->coordinate;
 
     auto& old_square = get_square(curr_coord);
     auto& new_square = get_square(new_coordinate);
 
-    old_square.piece = nullptr;
     new_square.piece = moving_piece;
-
     moving_piece->set_coordinate(new_coordinate);
+
+    // DONT TOUCH THIS FUCKER
+    // KEEP IT AT THE END
+    // FUCKIGN BITCH COST ME A WHOEL DAY OF STRUGGLE
+    old_square.piece = nullptr;
 }
 
 Board::Square& Board::get_square(int row, int col) {
@@ -320,5 +306,5 @@ void Board::Square::draw(const Board& board) {
 }
 
 std::shared_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
-    return (color == Piece::COLOR::WHITE) ? board.w_pieces[index] : board.b_pieces[index];
+    return board.get_square(coordinate).piece;
 }

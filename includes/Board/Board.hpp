@@ -51,8 +51,7 @@ private:
 
     struct SelectedPiece {
         bool        is_any_selected = false;
-        int         index;
-        Piece::COLOR color;
+        Coordinate  coordinate = Coordinate(0, 0);
 
         std::shared_ptr<Piece>& piece(Board& board) const;
     } selected_piece;
