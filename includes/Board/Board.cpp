@@ -90,7 +90,7 @@ bool Board::piece_clicked() {
 
             if(w_pieces[i]->coordinate == clicked_coordinate) {
                 selected_piece.is_any_selected = true;
-                selected_piece.side  = Piece::COLOR::WHITE;
+                selected_piece.color  = Piece::COLOR::WHITE;
                 selected_piece.index = i;
 
                 return true;
@@ -102,7 +102,7 @@ bool Board::piece_clicked() {
 
             if(b_pieces[i]->coordinate == clicked_coordinate) {
                 selected_piece.is_any_selected = true;
-                selected_piece.side  = Piece::COLOR::BLACK;
+                selected_piece.color  = Piece::COLOR::BLACK;
                 selected_piece.index = i;
 
                 return true;
@@ -261,36 +261,36 @@ void Board::add_pieces_to_board() {
     }
 }
 
-std::shared_ptr<Piece> Board::make_pawn(int row, int col, Piece::COLOR side) {
+std::shared_ptr<Piece> Board::make_pawn(int row, int col, Piece::COLOR color) {
     return std::make_shared<Pawn>(
-        render_window, Coordinate(row, col), board_local_bound, side
+        render_window, Coordinate(row, col), board_local_bound, color
     );
 }
 
-std::shared_ptr<Piece> Board::make_king(int row, int col, Piece::COLOR side) {
+std::shared_ptr<Piece> Board::make_king(int row, int col, Piece::COLOR color) {
     return std::make_shared<King>(
-        render_window, Coordinate(row, col), board_local_bound, side
+        render_window, Coordinate(row, col), board_local_bound, color
     );
 }
 
-std::shared_ptr<Piece> Board::make_queen(int row, int col, Piece::COLOR side) {
+std::shared_ptr<Piece> Board::make_queen(int row, int col, Piece::COLOR color) {
     return std::make_shared<Queen>(
-        render_window, Coordinate(row, col), board_local_bound, side
+        render_window, Coordinate(row, col), board_local_bound, color
     );
 }
-std::shared_ptr<Piece> Board::make_rook(int row, int col, Piece::COLOR side) {
+std::shared_ptr<Piece> Board::make_rook(int row, int col, Piece::COLOR color) {
     return std::make_shared<Rook>(
-        render_window, Coordinate(row, col), board_local_bound, side
+        render_window, Coordinate(row, col), board_local_bound, color
     );
 }
-std::shared_ptr<Piece> Board::make_knight(int row, int col, Piece::COLOR side) {
+std::shared_ptr<Piece> Board::make_knight(int row, int col, Piece::COLOR color) {
     return std::make_shared<Knight>(
-        render_window, Coordinate(row, col), board_local_bound, side
+        render_window, Coordinate(row, col), board_local_bound, color
     );
 }
-std::shared_ptr<Piece> Board::make_bishop(int row, int col, Piece::COLOR side) {
+std::shared_ptr<Piece> Board::make_bishop(int row, int col, Piece::COLOR color) {
     return std::make_shared<Bishop>(
-        render_window, Coordinate(row, col), board_local_bound, side
+        render_window, Coordinate(row, col), board_local_bound, color
     );
 }
 
@@ -320,5 +320,5 @@ void Board::Square::draw(const Board& board) {
 }
 
 std::shared_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
-    return (side == Piece::COLOR::WHITE) ? board.w_pieces[index] : board.b_pieces[index];
+    return (color == Piece::COLOR::WHITE) ? board.w_pieces[index] : board.b_pieces[index];
 }

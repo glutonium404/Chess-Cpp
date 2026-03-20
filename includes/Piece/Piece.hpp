@@ -16,9 +16,9 @@ struct Coordinate {
     bool operator!=(const Coordinate& other) const;
     std::string log() {
         std::string msg = "{";
-        msg += row;
-        msg += " , ";
-        msg += col;
+        msg += std::to_string(row);
+        msg += ", ";
+        msg += std::to_string(col);;
         msg += "}";
         return msg;
     }
@@ -33,6 +33,7 @@ public:
     std::string         texture_path;
     Coordinate          coordinate;
     sf::FloatRect       board_local_bound;
+    Piece::COLOR        color;
     bool                is_alive = true;
     float               square_length;
 
@@ -40,7 +41,8 @@ public:
         sf::RenderWindow& render_window,
         std::string texture_path,
         Coordinate coordinate,
-        sf::FloatRect board_local_bound
+        sf::FloatRect board_local_bound,
+        COLOR color
     );
 
     virtual ~Piece();

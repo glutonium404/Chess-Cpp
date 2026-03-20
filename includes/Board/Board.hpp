@@ -43,15 +43,16 @@ public:
     void draw();
 
 private:
-    Piece::COLOR                            current_turn      = Piece::COLOR::WHITE;
     sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
 
+    Piece::COLOR current_turn   = Piece::COLOR::WHITE;
+
     struct SelectedPiece {
         bool        is_any_selected = false;
         int         index;
-        Piece::COLOR side;
+        Piece::COLOR color;
 
         std::shared_ptr<Piece>& piece(Board& board) const;
     } selected_piece;
@@ -71,10 +72,10 @@ private:
     Square&     get_square(int row, int col);
     Coordinate  get_clicked_coordinate();
 
-    std::shared_ptr<Piece> make_pawn  (int row, int col, Piece::COLOR side);
-    std::shared_ptr<Piece> make_king  (int row, int col, Piece::COLOR side);
-    std::shared_ptr<Piece> make_queen (int row, int col, Piece::COLOR side);
-    std::shared_ptr<Piece> make_rook  (int row, int col, Piece::COLOR side);
-    std::shared_ptr<Piece> make_knight(int row, int col, Piece::COLOR side);
-    std::shared_ptr<Piece> make_bishop(int row, int col, Piece::COLOR side);
+    std::shared_ptr<Piece> make_pawn  (int row, int col, Piece::COLOR color);
+    std::shared_ptr<Piece> make_king  (int row, int col, Piece::COLOR color);
+    std::shared_ptr<Piece> make_queen (int row, int col, Piece::COLOR color);
+    std::shared_ptr<Piece> make_rook  (int row, int col, Piece::COLOR color);
+    std::shared_ptr<Piece> make_knight(int row, int col, Piece::COLOR color);
+    std::shared_ptr<Piece> make_bishop(int row, int col, Piece::COLOR color);
 };

@@ -17,12 +17,14 @@ Piece::Piece(
     sf::RenderWindow& render_window,
     std::string texture_path,
     Coordinate coordinate,
-    sf::FloatRect board_local_bound
+    sf::FloatRect board_local_bound,
+    COLOR color
 )
     : render_window(render_window),
     texture_path(texture_path),
     coordinate(coordinate),
-    board_local_bound(board_local_bound)
+    board_local_bound(board_local_bound),
+    color(color)
 {
     square_length = board_local_bound.width / 8.f;
 

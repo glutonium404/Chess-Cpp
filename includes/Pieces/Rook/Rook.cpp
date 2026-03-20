@@ -4,14 +4,15 @@ Rook::Rook(
     sf::RenderWindow&   render_window,
     Coordinate          coordinate,
     sf::FloatRect       board_local_bound,
-    Piece::COLOR         side
+    Piece::COLOR         color
 )
     : Piece(
     render_window,
-    side == Piece::COLOR::BLACK ? "assets/images/rook-b.png" : "assets/images/rook-w.png",
+    color == Piece::COLOR::BLACK ? "assets/images/rook-b.png" : "assets/images/rook-w.png",
     coordinate,
-    board_local_bound
-), side(side) {}
+    board_local_bound,
+    color
+) {}
 
 std::vector<Coordinate> Rook::get_possible_moves() {
     std::vector<Coordinate> possible_moves;

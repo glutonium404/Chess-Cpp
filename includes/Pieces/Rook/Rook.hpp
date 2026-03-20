@@ -4,13 +4,11 @@
 
 class Rook : public Piece {
 public:
-    Piece::COLOR side;
-
     Rook(
         sf::RenderWindow&   render_window,
         Coordinate          coordinate,
         sf::FloatRect       board_local_bound,
-        Piece::COLOR        side
+        Piece::COLOR        color
     );
 
     TYPE                    get_type() const override;
