@@ -57,7 +57,7 @@ private:
 
     void        handle_click(sf::Event& event);
     void        set_board_local_bound(float& board_width);
-    void        set_squares_shapes();
+    void        set_squares();
     void        set_pieces();
     void        add_pieces_to_board();
     void        highlight_possible_moves(const std::shared_ptr<Piece>& piece);
