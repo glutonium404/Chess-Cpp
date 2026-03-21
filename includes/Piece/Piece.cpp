@@ -1,16 +1,6 @@
 #include "Piece.hpp"
 #include <iostream>
 
-Coordinate::Coordinate(int row, int col): row(row), col(col) {}
-
-bool Coordinate::operator==(const Coordinate& other) const {
-    return other.col == col && other.row == row;
-}
-
-bool Coordinate::operator!=(const Coordinate& other) const {
-    return other.col != col || other.row != row;
-}
-
 Piece::~Piece() {}
 
 Piece::Piece(
