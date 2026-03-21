@@ -12,7 +12,7 @@ public:
     );
 
     TYPE                    get_type() const override;
-    std::vector<Coordinate> get_possible_moves() override;
+    std::vector<Coordinate> get_legal_moves() override;
 
 private:
     bool is_first_move = true;

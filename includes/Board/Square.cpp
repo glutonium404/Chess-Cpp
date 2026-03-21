@@ -25,7 +25,7 @@ void Board::Square::draw(const Board& board) {
     if(piece && piece->is_alive) piece->draw();
 }
 
-bool Board::Square::is_a_possible_move(const Board& board) const {
+bool Board::Square::is_a_legal_moves(const Board& board) const {
     auto it = std::find(board.highlighted_coord.begin(), board.highlighted_coord.end(), coordinate);
     return it != board.highlighted_coord.end();
 }

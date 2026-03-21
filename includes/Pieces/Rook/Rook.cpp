@@ -14,15 +14,15 @@ Rook::Rook(
     color
 ) {}
 
-std::vector<Coordinate> Rook::get_possible_moves() {
-    std::vector<Coordinate> possible_moves;
-    possible_moves.reserve(16); // 16 = maximum possible moves
+std::vector<Coordinate> Rook::get_legal_moves() {
+    std::vector<Coordinate> legal_moves;
+    legal_moves.reserve(16); // 16 = maximum possible moves
 
     for(auto& coord: get_lookup_coordinates()) {
-        possible_moves.push_back(coord);
+        legal_moves.push_back(coord);
     }
 
-    return possible_moves;
+    return legal_moves;
 }
 
 const std::vector<Coordinate> Rook::get_lookup_coordinates() const {

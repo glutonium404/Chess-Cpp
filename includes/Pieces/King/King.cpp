@@ -14,17 +14,17 @@ King::King(
     color
 ) {}
 
-std::vector<Coordinate> King::get_possible_moves() {
-    std::vector<Coordinate> possible_moves;
-    possible_moves.reserve(8);
+std::vector<Coordinate> King::get_legal_moves() {
+    std::vector<Coordinate> legal_moves;
+    legal_moves.reserve(8);
 
     for(auto& coord: get_lookup_coordinates()) {
         if(!coord.is_valid()) continue;
 
-        possible_moves.push_back(coord);
+        legal_moves.push_back(coord);
     }
 
-    return possible_moves;
+    return legal_moves;
 }
 
 const std::vector<Coordinate> King::get_lookup_coordinates() const {

@@ -31,7 +31,7 @@ public:
         void unhighlight();
         void draw(const Board& board);
 
-        bool is_a_possible_move(const Board& board) const;
+        bool is_a_legal_moves(const Board& board) const;
     };
 
     float                               square_length;
@@ -60,7 +60,7 @@ private:
     void        set_squares();
     void        set_pieces();
     void        add_pieces_to_board();
-    void        highlight_possible_moves(const std::shared_ptr<Piece>& piece);
+    void        highlight_legal_moves(const std::shared_ptr<Piece>& piece);
     void        remove_existing_highilights();
     void        make_move(Square& new_square);
 

@@ -21,15 +21,15 @@ Pawn::Pawn(
     direction = coordinate.row > 4 ? -1 : 1;
 }
 
-std::vector<Coordinate> Pawn::get_possible_moves() {
-    std::vector<Coordinate> possible_moves;
+std::vector<Coordinate> Pawn::get_legal_moves() {
+    std::vector<Coordinate> legal_moves;
 
-    possible_moves.push_back( Coordinate( coordinate.row + (1 * direction), coordinate.col ) );
+    legal_moves.push_back( Coordinate( coordinate.row + (1 * direction), coordinate.col ) );
 
     if(is_first_move)
-        possible_moves.push_back( Coordinate( coordinate.row + (2 * direction), coordinate.col ) );
+        legal_moves.push_back( Coordinate( coordinate.row + (2 * direction), coordinate.col ) );
 
-    return possible_moves;
+    return legal_moves;
 }
 
 Piece::TYPE Pawn::get_type() const {

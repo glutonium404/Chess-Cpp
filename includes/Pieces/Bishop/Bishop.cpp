@@ -14,15 +14,15 @@ Bishop::Bishop(
     color
 ) {}
 
-std::vector<Coordinate> Bishop::get_possible_moves() {
-    std::vector<Coordinate> possible_moves;
-    possible_moves.reserve(15); // 15 = maximum possible moves
+std::vector<Coordinate> Bishop::get_legal_moves() {
+    std::vector<Coordinate> legal_moves;
+    legal_moves.reserve(15); // 15 = maximum possible moves
 
     for(auto& coord: get_lookup_coordinates()) {
-        possible_moves.push_back(coord);
+        legal_moves.push_back(coord);
     }
 
-    return possible_moves;
+    return legal_moves;
 }
 
 const std::vector<Coordinate> Bishop::get_lookup_coordinates() const {

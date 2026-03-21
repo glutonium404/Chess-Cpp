@@ -38,7 +38,7 @@ void Board::handle_click(sf::Event& event) {
 
     // ======= EMPTY SQUARE (square without peice or highlight) ======
 
-    if(!new_selected_square.piece && !new_selected_square.is_a_possible_move(*this)) {
+    if(!new_selected_square.piece && !new_selected_square.is_a_legal_moves(*this)) {
         remove_existing_highilights();
 
         if(selected_square) {
@@ -76,7 +76,7 @@ void Board::handle_click(sf::Event& event) {
 
         // highlight newly selected square piece and its possible moves
         new_selected_square.highlight();
-        highlight_possible_moves(new_selected_square.piece);
+        highlight_legal_moves(new_selected_square.piece);
         selected_square = &new_selected_square;
         return;
     }
@@ -92,8 +92,8 @@ void Board::handle_click(sf::Event& event) {
     }
 }
 
-void Board::highlight_possible_moves(const std::shared_ptr<Piece>& piece) {
-    highlighted_coord = piece->get_possible_moves();
+void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
+    highlighted_coord = piece->get_legal_moves();
 
     for(auto& coord: highlighted_coord) {
         get_square(coord).highlight();

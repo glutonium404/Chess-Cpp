@@ -30,7 +30,7 @@ public:
 
     virtual ~Piece();
     virtual TYPE                    get_type() const = 0;
-    virtual std::vector<Coordinate> get_possible_moves() = 0;
+    virtual std::vector<Coordinate> get_legal_moves() = 0;
 
     void draw();
     void set_coordinate(int row, int col);
