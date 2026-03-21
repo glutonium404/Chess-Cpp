@@ -47,6 +47,18 @@ void Piece::set_coordinate(int row, int col) {
     };
 
     sprite.setPosition(pos);
+
+    // has_moved must only be set to true once a move has been made with that piece
+    // set_coordinate() is being used in board set up to set up the pieces
+    // which would set has_moved to true before any actual move is made
+    //
+    // by using another bool initial_setup, we can check if it is the initial set up or not
+    // and making sure has_moved doesn't change white initial set up
+    if(initial_setup) {
+        initial_setup = false;
+        return;
+    }
+    has_moved = true;
 }
 
 void Piece::set_piece_scale(float scale) {

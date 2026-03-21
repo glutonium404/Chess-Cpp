@@ -15,6 +15,5 @@ public:
     std::vector<Coordinate> get_legal_moves(Board& board) override;
 
 private:
-    bool is_first_move = true;
     int direction;
 };

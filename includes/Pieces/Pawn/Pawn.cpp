@@ -1,10 +1,11 @@
 #include "Pawn.hpp"
+#include "../../Board/Board.hpp"
 
 Pawn::Pawn(
     sf::RenderWindow&   render_window,
     Coordinate          coordinate,
     sf::FloatRect       board_local_bound,
-    Piece::COLOR         color
+    Piece::COLOR        color
 )
     : Piece(
     render_window,
@@ -26,8 +27,20 @@ std::vector<Coordinate> Pawn::get_legal_moves(Board& board) {
 
     add_common_legal_moves(board, legal_moves, coordinate.row + (1 * direction), coordinate.col);
 
-    if(is_first_move)
+    if(!has_moved)
         add_common_legal_moves(board, legal_moves, coordinate.row + (2 * direction), coordinate.col);
+
+    Coordinate diagonal_1 = Coordinate(coordinate.row + (1 * direction), coordinate.col + 1);
+    Coordinate diagonal_2 = Coordinate(coordinate.row + (1 * direction), coordinate.col - 1);
+
+    auto& diagonal_1_piece = board.get_square(diagonal_1).piece;
+    auto& diagonal_2_piece = board.get_square(diagonal_2).piece;
+
+    if(diagonal_1_piece && diagonal_1_piece->color != board.current_turn)
+        legal_moves.push_back(diagonal_1);
+
+    if(diagonal_2_piece && diagonal_2_piece->color != board.current_turn)
+        legal_moves.push_back(diagonal_2);
 
     return legal_moves;
 }

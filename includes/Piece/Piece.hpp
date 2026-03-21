@@ -44,11 +44,13 @@ public:
 private:
     std::shared_ptr<sf::Texture> texture;
     sf::Sprite                   sprite;
+    bool                         initial_setup = true;
 
     void setup_sprite();
 
 protected:
     Coordinate coordinate;
+    bool       has_moved = false;
 
     bool add_common_legal_moves(Board& board, std::vector<Coordinate>& legal_moves, const int row, const int col) const;
 };
