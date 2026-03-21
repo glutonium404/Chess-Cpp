@@ -12,8 +12,8 @@ public:
     );
 
     TYPE                    get_type() const override;
-    std::vector<Coordinate> get_legal_moves() override;
+    std::vector<Coordinate> get_legal_moves(Board& board) override;
 
 private:
-    const std::vector<Coordinate> get_lookup_coordinates() const;
+    const std::vector<Coordinate> get_lookup_coordinates(Board& board) const;
 };

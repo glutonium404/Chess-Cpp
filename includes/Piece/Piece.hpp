@@ -8,6 +8,8 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
+class Board;
+
 class Piece {
 public:
     enum class COLOR { BLACK, WHITE };
@@ -30,7 +32,7 @@ public:
 
     virtual ~Piece();
     virtual TYPE                    get_type() const = 0;
-    virtual std::vector<Coordinate> get_legal_moves() = 0;
+    virtual std::vector<Coordinate> get_legal_moves(Board& board) = 0;
 
     void draw();
     void set_coordinate(int row, int col);
@@ -47,4 +49,6 @@ private:
 
 protected:
     Coordinate coordinate;
+
+    bool add_common_legal_moves(Board& board, std::vector<Coordinate>& legal_moves, const int row, const int col) const;
 };

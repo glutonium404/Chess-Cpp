@@ -39,18 +39,22 @@ public:
     sf::FloatRect                       board_local_bound;
     std::vector<std::shared_ptr<Piece>> b_pieces;
     std::vector<std::shared_ptr<Piece>> w_pieces;
+    Piece::COLOR                        current_turn = Piece::COLOR::WHITE;
 
     Board(float board_width, sf::RenderWindow& render_window);
 
     void handle_event(sf::Event& event);
     void draw();
 
+    Square& get_square(const Coordinate& coordinate);
+    Square& get_square(int row, int col);
+
+
 private:
     sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
 
-    Piece::COLOR current_turn    = Piece::COLOR::WHITE;
     Square*      selected_square = nullptr;
 
     bool        is_mouse_clicked(sf::Event& event) const;
@@ -63,9 +67,6 @@ private:
     void        highlight_legal_moves(const std::shared_ptr<Piece>& piece);
     void        remove_existing_highilights();
     void        make_move(Square& new_square);
-
-    Square&     get_square(const Coordinate& coordinate);
-    Square&     get_square(int row, int col);
 
     Coordinate  get_clicked_coordinate();
 

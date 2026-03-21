@@ -93,7 +93,7 @@ void Board::handle_click(sf::Event& event) {
 }
 
 void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
-    highlighted_coord = piece->get_legal_moves();
+    highlighted_coord = piece->get_legal_moves(*this);
 
     for(auto& coord: highlighted_coord) {
         get_square(coord).highlight();

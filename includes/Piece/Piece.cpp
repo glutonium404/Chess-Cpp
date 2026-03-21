@@ -1,4 +1,5 @@
 #include "Piece.hpp"
+#include "../Board/Board.hpp"
 #include <iostream>
 
 Piece::~Piece() {}
@@ -63,4 +64,13 @@ void Piece::setup_sprite() {
 
     sf::FloatRect local_bound = sprite.getLocalBounds();
     sprite.setOrigin(local_bound.width / 2.f, local_bound.height / 2.f);
+}
+
+bool Piece::add_common_legal_moves(Board& board, std::vector<Coordinate>& legal_moves, const int row, const int col) const {
+    auto& piece = board.get_square(row, col).piece;
+
+    if(piece && piece->color == board.current_turn) return true;
+    legal_moves.push_back({ row, col });
+    if(piece && piece->color != board.current_turn) return true;
+    return false;
 }

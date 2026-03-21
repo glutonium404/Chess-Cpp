@@ -21,7 +21,7 @@ Pawn::Pawn(
     direction = coordinate.row > 4 ? -1 : 1;
 }
 
-std::vector<Coordinate> Pawn::get_legal_moves() {
+std::vector<Coordinate> Pawn::get_legal_moves(Board& board) {
     std::vector<Coordinate> legal_moves;
 
     legal_moves.push_back( Coordinate( coordinate.row + (1 * direction), coordinate.col ) );

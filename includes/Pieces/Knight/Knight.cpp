@@ -14,11 +14,11 @@ Knight::Knight(
     color
 ) {}
 
-std::vector<Coordinate> Knight::get_legal_moves() {
+std::vector<Coordinate> Knight::get_legal_moves(Board& board) {
     std::vector<Coordinate> legal_moves;
     legal_moves.reserve(8); // 8 = maximum possible moves
 
-    for(auto& coord: get_lookup_coordinates()) {
+    for(auto& coord: get_lookup_coordinates(board)) {
         if(!coord.is_valid()) continue;
 
         legal_moves.push_back(coord);
@@ -27,7 +27,7 @@ std::vector<Coordinate> Knight::get_legal_moves() {
     return legal_moves;
 }
 
-const std::vector<Coordinate> Knight::get_lookup_coordinates() const {
+const std::vector<Coordinate> Knight::get_lookup_coordinates(Board& board) const {
     std::vector<Coordinate> lookup_coordinates;
     lookup_coordinates.reserve(8);
 
