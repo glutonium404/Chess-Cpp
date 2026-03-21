@@ -8,6 +8,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <memory>
+#include <my_utils.hpp>
 
 Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
     w_pieces.reserve(16);
@@ -34,13 +35,70 @@ void Board::draw() {
     }
 }
 
-void Board::highlight_possible_moves(const std::shared_ptr<Piece>& piece) {
-    // if previously any player piece was selected
-    // we need to remove the highlighted squares for that piece
+void Board::handle_click(sf::Event& event) {
+    Coordinate clicked_coordinate = get_clicked_coordinate();
+
+    if(!clicked_coordinate.is_valid()) return;
+
+    Square& new_selected_square = get_square(clicked_coordinate);
+
+    // ======= EMPTY SQUARE (square without peice or highlight) ======
+
+    if(!new_selected_square.piece && !new_selected_square.is_a_possible_move(*this)) {
+        remove_existing_highilights();
+
+        if(selected_square) {
+            selected_square->unhighlight();
+            selected_square = nullptr;
+        }
+
+        return;
+    }
+
+    // ====== EIHTER A PIECE OR A HIGHLIGHT SQUARE IS CLICKED =====
+
+    // if a highlighted square is clicked
+    if(!new_selected_square.piece) {
+        selected_square->unhighlight();
+        remove_existing_highilights();
+        make_move(new_selected_square);
+        current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
+        return;
+    }
+
+    // if a player piece was clicked
+    if(new_selected_square.piece->color == current_turn) {
+
+        // return is the same piece is clicked again
+        if(selected_square == &new_selected_square) {
+            return;
+        }
+
+        // remove highlights if any previous player piece was selected
+        if(selected_square) {
+            selected_square->unhighlight();
+            remove_existing_highilights();
+        }
+
+        // highlight newly selected square piece and its possible moves
+        new_selected_square.highlight();
+        highlight_possible_moves(new_selected_square.piece);
+        selected_square = &new_selected_square;
+        return;
+    }
+
+    // opposition piece was clicked
+
+    // remove all highlights except checks (TODO: check logic) and reset selected_square
     remove_existing_highilights();
 
-    get_square(selected_piece.piece(*this)->coordinate).highlight();
+    if(selected_square) {
+        selected_square->unhighlight();
+        selected_square = nullptr;
+    }
+}
 
+void Board::highlight_possible_moves(const std::shared_ptr<Piece>& piece) {
     highlighted_coord = piece->get_possible_moves();
 
     for(auto& coord: highlighted_coord) {
@@ -56,59 +114,6 @@ void Board::remove_existing_highilights() {
     highlighted_coord.clear();
 }
 
-void Board::handle_click(sf::Event& event) {
-    // remove highilight from any previously selected piece square
-    // without this when we select a piece and then select another piece
-    // the square of the previously selected piece stays highlighted
-    if(selected_piece.is_any_selected) {
-        get_square(selected_piece.piece(*this)->coordinate).unhighlight();
-    }
-
-    // checks if any player piece is clicked
-    if(piece_clicked()) {
-        highlight_possible_moves(selected_piece.piece(*this));
-        return;
-    }
-
-    // if any piece was previously selected
-    // it checks if any highilighted square was clicked and makes the move if so
-    if(selected_piece.is_any_selected) {
-        highlighted_square_clicked();
-    }
-
-    // no pieces were selected
-    selected_piece.is_any_selected = false;
-    remove_existing_highilights();
-}
-
-bool Board::piece_clicked() {
-    auto clicked_coordinate = get_clicked_coordinate();
-    auto& sq = get_square(clicked_coordinate);
-
-    if(sq.piece && sq.piece->is_alive && sq.piece->color == current_turn) {
-        selected_piece.is_any_selected = true;
-        selected_piece.coordinate = sq.piece->coordinate;
-        return true;
-    }
-
-    // we are setting is_any_selected to false in handle_click
-    // because we need this variable to check if any highlighted square is clicked
-    return false;
-}
-
-void Board::highlighted_square_clicked() {
-    auto clicked_coordinate = get_clicked_coordinate();
-
-    for(auto& coord: highlighted_coord) {
-        if(coord != clicked_coordinate) continue;
-
-        make_move(coord);
-
-        // toggle player
-        current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
-        return;
-    }
-}
 
 bool Board::is_mouse_clicked(sf::Event& event) const {
     if(event.type != sf::Event::MouseButtonPressed || event.mouseButton.button != sf::Mouse::Left) return false;
@@ -133,22 +138,12 @@ Coordinate Board::get_clicked_coordinate() {
     return Coordinate(row, col);
 }
 
-void Board::make_move(Coordinate& new_coordinate) {
-    if(!selected_piece.is_any_selected) return;
+void Board::make_move(Square& new_square) {
+    if(!selected_square || !selected_square->piece) return;
 
-    auto moving_piece = selected_piece.piece(*this);
-    auto& curr_coord = moving_piece->coordinate;
-
-    auto& old_square = get_square(curr_coord);
-    auto& new_square = get_square(new_coordinate);
-
-    new_square.piece = moving_piece;
-    moving_piece->set_coordinate(new_coordinate);
-
-    // DONT TOUCH THIS FUCKER
-    // KEEP IT AT THE END
-    // FUCKIGN BITCH COST ME A WHOEL DAY OF STRUGGLE
-    old_square.piece = nullptr;
+    new_square.piece = selected_square->piece;
+    new_square.piece->set_coordinate(new_square.coordinate);
+    selected_square->piece = nullptr;
 }
 
 Board::Square& Board::get_square(int row, int col) {
@@ -189,7 +184,8 @@ void Board::set_squares_shapes() {
             squares[i][j].shape.setFillColor(color);
             squares[i][j].shape.setPosition(position);
 
-            squares[i][j].type = flag ? Square::COLOR::LIGHT : Square::COLOR::DARK;
+            squares[i][j].coordinate = Coordinate(i+1, j+1);
+            squares[i][j].type       = flag ? Square::COLOR::LIGHT : Square::COLOR::DARK;
 
             if(j != 7) { flag = !flag; }
         }
@@ -238,11 +234,11 @@ void Board::set_pieces() {
 
 void Board::add_pieces_to_board() {
     for(auto& piece: w_pieces) {
-        auto& coord = piece->coordinate;
+        auto coord = piece->get_coordinate();
         squares[coord.row - 1][coord.col - 1].piece = piece;
     }
     for(auto& piece: b_pieces) {
-        auto& coord = piece->coordinate;
+        auto coord = piece->get_coordinate();
         squares[coord.row - 1][coord.col - 1].piece = piece;
     }
 }
@@ -292,19 +288,4 @@ void Board::Square::highlight() {
             shape.setFillColor(Square::red_highlight);
             break;
     }
-}
-
-void Board::Square::unhighlight() {
-    shape.setFillColor(
-        type == COLOR::LIGHT ? Square::light_color : Square::dark_color
-    );
-}
-
-void Board::Square::draw(const Board& board) {
-    board.render_window.draw(shape);
-    if(piece && piece->is_alive) piece->draw();
-}
-
-std::shared_ptr<Piece>& Board::SelectedPiece::piece(Board& board) const {
-    return board.get_square(coordinate).piece;
 }

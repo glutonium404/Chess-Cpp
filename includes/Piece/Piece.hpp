@@ -15,7 +15,6 @@ public:
 
     sf::RenderWindow&   render_window;
     std::string         texture_path;
-    Coordinate          coordinate;
     sf::FloatRect       board_local_bound;
     Piece::COLOR        color;
     bool                is_alive = true;
@@ -38,6 +37,8 @@ public:
     void set_coordinate(const Coordinate& coord);
     void set_piece_scale(float scale);
 
+    Coordinate get_coordinate() const;
+
 private:
     std::shared_ptr<sf::Texture> texture;
     sf::Sprite                   sprite;
@@ -45,4 +46,5 @@ private:
     void setup_sprite();
 
 protected:
+    Coordinate coordinate;
 };

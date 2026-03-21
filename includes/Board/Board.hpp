@@ -23,12 +23,15 @@ public:
         inline static const sf::Color red_highlight    = sf::Color(149, 82, 82);
 
         COLOR                   type;
+        Coordinate              coordinate = Coordinate(0, 0);
         sf::RectangleShape      shape;
         std::shared_ptr<Piece>  piece = nullptr;
 
         void highlight();
         void unhighlight();
         void draw(const Board& board);
+
+        bool is_a_possible_move(const Board& board) const;
     };
 
     float                               square_length;
@@ -47,28 +50,23 @@ private:
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
 
-    Piece::COLOR current_turn   = Piece::COLOR::WHITE;
-
-    struct SelectedPiece {
-        bool        is_any_selected = false;
-        Coordinate  coordinate = Coordinate(0, 0);
-
-        std::shared_ptr<Piece>& piece(Board& board) const;
-    } selected_piece;
+    Piece::COLOR current_turn    = Piece::COLOR::WHITE;
+    Square*      selected_square = nullptr;
 
     bool        is_mouse_clicked(sf::Event& event) const;
-    bool        piece_clicked();
+
     void        handle_click(sf::Event& event);
-    void        highlighted_square_clicked();
     void        set_board_local_bound(float& board_width);
     void        set_squares_shapes();
     void        set_pieces();
     void        add_pieces_to_board();
     void        highlight_possible_moves(const std::shared_ptr<Piece>& piece);
     void        remove_existing_highilights();
-    void        make_move(Coordinate& new_coordinate);
+    void        make_move(Square& new_square);
+
     Square&     get_square(const Coordinate& coordinate);
     Square&     get_square(int row, int col);
+
     Coordinate  get_clicked_coordinate();
 
     std::shared_ptr<Piece> make_pawn  (int row, int col, Piece::COLOR color);

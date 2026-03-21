@@ -27,6 +27,8 @@ void Piece::draw() {
     render_window.draw(sprite);
 }
 
+Coordinate Piece::get_coordinate() const { return coordinate; }
+
 void Piece::set_coordinate(const Coordinate& coord) { set_coordinate(coord.row, coord.col); }
 
 void Piece::set_coordinate(int row, int col) {
