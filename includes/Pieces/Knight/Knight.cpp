@@ -31,17 +31,24 @@ const std::vector<Coordinate> Knight::get_lookup_coordinates(Board& board) const
     std::vector<Coordinate> lookup_coordinates;
     lookup_coordinates.reserve(8);
 
-    lookup_coordinates.push_back( Coordinate( coordinate.row - 2, coordinate.col - 1 ) );
-    lookup_coordinates.push_back( Coordinate( coordinate.row - 2, coordinate.col + 1 ) );
+    std::vector<Coordinate> common_lookup_coordinates = {
+        {coordinate.row - 2, coordinate.col - 1},
+        {coordinate.row - 2, coordinate.col + 1},
 
-    lookup_coordinates.push_back( Coordinate( coordinate.row + 2, coordinate.col - 1 ) );
-    lookup_coordinates.push_back( Coordinate( coordinate.row + 2, coordinate.col + 1 ) );
+        {coordinate.row + 2, coordinate.col - 1},
+        {coordinate.row + 2, coordinate.col + 1},
 
-    lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col - 2 ) );
-    lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col - 2 ) );
+        {coordinate.row + 1, coordinate.col - 2},
+        {coordinate.row - 1, coordinate.col - 2},
 
-    lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col + 2 ) );
-    lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col + 2 ) );
+        {coordinate.row + 1, coordinate.col + 2},
+        {coordinate.row - 1, coordinate.col + 2}
+    };
+
+    for(auto& coord: common_lookup_coordinates) {
+        if(coord.is_valid())
+            add_common_legal_moves(board, lookup_coordinates, coord.row, coord.col);
+    }
 
     return lookup_coordinates;
 }

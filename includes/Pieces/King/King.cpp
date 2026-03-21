@@ -31,16 +31,23 @@ const std::vector<Coordinate> King::get_lookup_coordinates(Board& board) const {
     std::vector<Coordinate> lookup_coordinates;
     lookup_coordinates.reserve(8);
 
-    lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col - 1 ) ); // top left
-    lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col     ) ); // top middle
-    lookup_coordinates.push_back( Coordinate( coordinate.row - 1, coordinate.col + 1 ) ); // top right
+    std::vector<Coordinate> common_lookup_coordinates = {
+        {coordinate.row - 1, coordinate.col - 1}, // top left
+        {coordinate.row - 1, coordinate.col    }, // top middle
+        {coordinate.row - 1, coordinate.col + 1}, // top right
 
-    lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col - 1 ) ); // bottom left
-    lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col     ) ); // bottom middle
-    lookup_coordinates.push_back( Coordinate( coordinate.row + 1, coordinate.col + 1 ) ); // bottom right
+        {coordinate.row + 1, coordinate.col - 1}, // bottom left
+        {coordinate.row + 1, coordinate.col    }, // bottom middle
+        {coordinate.row + 1, coordinate.col + 1}, // bottom right
 
-    lookup_coordinates.push_back( Coordinate( coordinate.row    , coordinate.col - 1 ) ); // center left
-    lookup_coordinates.push_back( Coordinate( coordinate.row    , coordinate.col + 1 ) ); // center right
+        {coordinate.row    , coordinate.col - 1}, // center left
+        {coordinate.row    , coordinate.col + 1}  // center right
+    };
+
+    for(auto& coord: common_lookup_coordinates) {
+        if(coord.is_valid())
+            add_common_legal_moves(board, lookup_coordinates, coord.row, coord.col);
+    }
 
     return lookup_coordinates;
 }

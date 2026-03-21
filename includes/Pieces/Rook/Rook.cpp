@@ -33,22 +33,26 @@ const std::vector<Coordinate> Rook::get_lookup_coordinates(Board& board) const {
 
     // all left squares
     for(col = coordinate.col - 1; col > 0; col--) {
-        lookup_coordinates.push_back({ coordinate.row, col });
+        if(add_common_legal_moves(board, lookup_coordinates, coordinate.row, col))
+            break;
     }
 
     // all right squares
     for(col = coordinate.col + 1; col < 9; col++) {
-        lookup_coordinates.push_back({ coordinate.row, col });
+        if(add_common_legal_moves(board, lookup_coordinates, coordinate.row, col))
+            break;
     }
 
     // all top squares
     for(row = coordinate.row - 1; row > 0; row--) {
-        lookup_coordinates.push_back({ row, coordinate.col });
+        if(add_common_legal_moves(board, lookup_coordinates, row, coordinate.col))
+            break;
     }
 
     // all bottom squares
     for(row = coordinate.row + 1; row < 9; row++) {
-        lookup_coordinates.push_back({ row, coordinate.col });
+        if(add_common_legal_moves(board, lookup_coordinates, row, coordinate.col))
+            break;
     }
 
     return lookup_coordinates;

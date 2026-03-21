@@ -24,10 +24,10 @@ Pawn::Pawn(
 std::vector<Coordinate> Pawn::get_legal_moves(Board& board) {
     std::vector<Coordinate> legal_moves;
 
-    legal_moves.push_back( Coordinate( coordinate.row + (1 * direction), coordinate.col ) );
+    add_common_legal_moves(board, legal_moves, coordinate.row + (1 * direction), coordinate.col);
 
     if(is_first_move)
-        legal_moves.push_back( Coordinate( coordinate.row + (2 * direction), coordinate.col ) );
+        add_common_legal_moves(board, legal_moves, coordinate.row + (2 * direction), coordinate.col);
 
     return legal_moves;
 }
