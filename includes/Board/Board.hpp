@@ -28,6 +28,7 @@ public:
         std::shared_ptr<Piece>  piece = nullptr;
 
         void highlight();
+        void highlight(const sf::Color& color);
         void unhighlight();
         void draw(const Board& board);
 

@@ -1,17 +1,13 @@
 #include "Board.hpp"
 
+void Board::Square::highlight(const sf::Color& color) {
+    shape.setFillColor(color);
+}
+
 void Board::Square::highlight() {
-    switch (type) {
-        case COLOR::LIGHT:
-            shape.setFillColor(Square::light_highlight);
-            break;
-        case COLOR::DARK:
-            shape.setFillColor(Square::dark_highlight);
-            break;
-        case COLOR::RED:
-            shape.setFillColor(Square::red_highlight);
-            break;
-    }
+    shape.setFillColor(
+        type == COLOR::LIGHT ? Square::light_highlight : Square::dark_highlight
+    );
 }
 
 void Board::Square::unhighlight() {

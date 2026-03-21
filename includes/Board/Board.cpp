@@ -96,8 +96,15 @@ void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
     highlighted_coord = piece->get_legal_moves(*this);
 
     for(auto& coord: highlighted_coord) {
-        get_square(coord).highlight();
+        auto& sq = get_square(coord);
+
+        if(sq.piece && sq.piece->color != current_turn) {
+            sq.highlight(Square::red_highlight);
+        }else {
+            sq.highlight();
+        }
     }
+
 }
 
 void Board::remove_existing_highilights() {
