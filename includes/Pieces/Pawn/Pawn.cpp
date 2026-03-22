@@ -23,22 +23,35 @@ Pawn::Pawn(
 }
 
 void Pawn::set_legal_moves(Board& board) {
-    add_common_legal_moves(board, coordinate.row + (1 * direction), coordinate.col);
+    int forward_row = coordinate.row + direction;
 
-    if(!has_moved)
-        add_common_legal_moves(board, coordinate.row + (2 * direction), coordinate.col);
+    if(Coordinate::is_valid(forward_row, coordinate.col)) {
+        auto& sq = board.get_square(forward_row, coordinate.col);
 
-    Coordinate diagonal_1 = Coordinate(coordinate.row + (1 * direction), coordinate.col + 1);
-    Coordinate diagonal_2 = Coordinate(coordinate.row + (1 * direction), coordinate.col - 1);
+        if(!sq.piece) {
+            legal_moves.push_back({ forward_row, coordinate.col });
 
-    auto& diagonal_1_piece = board.get_square(diagonal_1).piece;
-    auto& diagonal_2_piece = board.get_square(diagonal_2).piece;
+            if(!has_moved) {
+                int double_forward = coordinate.row + (2 * direction);
 
-    if(diagonal_1_piece && diagonal_1_piece->color != board.current_turn)
-        legal_moves.push_back(diagonal_1);
+                if(!board.get_square(double_forward, coordinate.col).piece) {
+                    legal_moves.push_back({ double_forward, coordinate.col });
+                }
+            }
+        }
+    }
 
-    if(diagonal_2_piece && diagonal_2_piece->color != board.current_turn)
-        legal_moves.push_back(diagonal_2);
+    int diag_cols[] = { coordinate.col - 1, coordinate.col + 1 };
+
+    for(int diag_col: diag_cols) {
+        if(Coordinate::is_valid(forward_row, diag_col)) {
+            auto& sq = board.get_square(forward_row, diag_col);
+
+            if(sq.piece && sq.piece->color != color) {
+                legal_moves.push_back({ forward_row, diag_col });
+            }
+        }
+    }
 }
 
 Piece::TYPE Pawn::get_type() const {
