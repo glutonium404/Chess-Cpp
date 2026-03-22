@@ -49,7 +49,6 @@ void Board::set_pieces() {
     b_pieces.push_back( make_knight (1, 2, Piece::COLOR::BLACK) );
     b_pieces.push_back( make_bishop (1, 3, Piece::COLOR::BLACK) );
     b_pieces.push_back( make_queen  (1, 4, Piece::COLOR::BLACK) );
-    b_pieces.push_back( make_king   (1, 5, Piece::COLOR::BLACK) );
     b_pieces.push_back( make_bishop (1, 6, Piece::COLOR::BLACK) );
     b_pieces.push_back( make_knight (1, 7, Piece::COLOR::BLACK) );
     b_pieces.push_back( make_rook   (1, 8, Piece::COLOR::BLACK) );
@@ -69,7 +68,6 @@ void Board::set_pieces() {
     w_pieces.push_back( make_knight (8, 2, Piece::COLOR::WHITE) );
     w_pieces.push_back( make_bishop (8, 3, Piece::COLOR::WHITE) );
     w_pieces.push_back( make_queen  (8, 4, Piece::COLOR::WHITE) );
-    w_pieces.push_back( make_king   (8, 5, Piece::COLOR::WHITE) );
     w_pieces.push_back( make_bishop (8, 6, Piece::COLOR::WHITE) );
     w_pieces.push_back( make_knight (8, 7, Piece::COLOR::WHITE) );
     w_pieces.push_back( make_rook   (8, 8, Piece::COLOR::WHITE) );
@@ -82,6 +80,14 @@ void Board::set_pieces() {
     w_pieces.push_back( make_pawn(7, 6, Piece::COLOR::WHITE) );
     w_pieces.push_back( make_pawn(7, 7, Piece::COLOR::WHITE) );
     w_pieces.push_back( make_pawn(7, 8, Piece::COLOR::WHITE) );
+
+
+    // when updating legal moves
+    // we need the kigns to be updated at the very end
+    // this is necessary for knowing if a square is safe or not for a king to be considered a legal move
+    // which is why we are adding both kings at the very end
+    w_pieces.push_back( make_king   (8, 5, Piece::COLOR::WHITE) );
+    b_pieces.push_back( make_king   (1, 5, Piece::COLOR::BLACK) );
 }
 
 void Board::add_pieces_to_board() {

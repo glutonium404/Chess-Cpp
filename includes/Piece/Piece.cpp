@@ -80,14 +80,19 @@ void Piece::setup_sprite() {
 }
 
 bool Piece::add_common_legal_moves(Board& board, const int row, const int col) {
-    auto& piece = board.get_square(row, col).piece;
+    auto& sq = board.get_square(row, col);
 
-    if(piece && piece->color == color) return true;
+    if(sq.piece && sq.piece->color == color) return true;
 
     legal_moves.push_back({ row, col });
 
-    if(piece && piece->color != color) {
-        piece->attacked_by.push_back(this);
+    if(color == Piece::COLOR::WHITE)
+        sq.is_controlled_by_white = true;
+    else
+        sq.is_controlled_by_black = true;
+
+    if(sq.piece && sq.piece->color != color) {
+        sq.piece->attacked_by.push_back(this);
         return true;
     }
 

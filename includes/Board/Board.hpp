@@ -32,6 +32,9 @@ public:
         void unhighlight();
         void draw(const Board& board);
 
+        bool is_controlled_by_white = false;
+        bool is_controlled_by_black = false;
+
         bool is_a_legal_moves(const Board& board) const;
     };
 
@@ -70,6 +73,7 @@ private:
     void        make_move(Square& new_square);
     void        toggle_player();
     void        update_legal_moves();
+    void        reset_variables();
 
     Coordinate  get_clicked_coordinate();
 

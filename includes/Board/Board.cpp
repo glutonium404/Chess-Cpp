@@ -3,6 +3,7 @@
 #include <SFML/Window/Event.hpp>
 #include <memory>
 #include <my_utils.hpp>
+#include <ostream>
 
 Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
     w_pieces.reserve(16);
@@ -58,6 +59,7 @@ void Board::handle_click(sf::Event& event) {
         remove_existing_highilights();
         make_move(new_selected_square);
         toggle_player();
+        reset_variables(); // call this before updating legal moves
         update_legal_moves();
         return;
     }
@@ -151,9 +153,6 @@ void Board::make_move(Square& new_square) {
 }
 
 void Board::update_legal_moves() {
-    for(auto& piece: w_pieces) piece->attacked_by.clear();
-    for(auto& piece: b_pieces) piece->attacked_by.clear();
-
     for(auto& piece: w_pieces) {
         piece->legal_moves.clear();
         piece->set_legal_moves(*this);
@@ -175,4 +174,16 @@ Board::Square& Board::get_square(const Coordinate& coord) {
 
 void Board::toggle_player() {
     current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
+}
+
+void Board::reset_variables() {
+    for(auto& row: squares) {
+        for(auto& sq: row) {
+            sq.is_controlled_by_black = false;
+            sq.is_controlled_by_white = false;
+        }
+    }
+
+    for(auto& piece: w_pieces) piece->attacked_by.clear();
+    for(auto& piece: b_pieces) piece->attacked_by.clear();
 }
