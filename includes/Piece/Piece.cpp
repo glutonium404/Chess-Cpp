@@ -18,6 +18,7 @@ Piece::Piece(
     color(color)
 {
     square_length = board_local_bound.width / 8.f;
+    legal_moves.reserve(28); // max legal moves a piece can have is 27 (queen)
 
     setup_sprite();
     set_piece_scale(square_length / texture->getSize().x);

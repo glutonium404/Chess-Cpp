@@ -11,9 +11,8 @@ public:
         Piece::COLOR        color
     );
 
-    TYPE                    get_type() const override;
-    std::vector<Coordinate> get_legal_moves(Board& board) override;
+    TYPE get_type() const override;
+    void set_legal_moves(Board& board) override;
 
 private:
-    const std::vector<Coordinate> get_lookup_coordinates(Board& board) const;
 };

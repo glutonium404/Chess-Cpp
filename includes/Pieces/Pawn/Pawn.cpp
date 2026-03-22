@@ -22,9 +22,7 @@ Pawn::Pawn(
     direction = coordinate.row > 4 ? -1 : 1;
 }
 
-std::vector<Coordinate> Pawn::get_legal_moves(Board& board) {
-    std::vector<Coordinate> legal_moves;
-
+void Pawn::set_legal_moves(Board& board) {
     add_common_legal_moves(board, legal_moves, coordinate.row + (1 * direction), coordinate.col);
 
     if(!has_moved)
@@ -41,8 +39,6 @@ std::vector<Coordinate> Pawn::get_legal_moves(Board& board) {
 
     if(diagonal_2_piece && diagonal_2_piece->color != board.current_turn)
         legal_moves.push_back(diagonal_2);
-
-    return legal_moves;
 }
 
 Piece::TYPE Pawn::get_type() const {

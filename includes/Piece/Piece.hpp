@@ -15,12 +15,13 @@ public:
     enum class COLOR { BLACK, WHITE };
     enum class TYPE  { KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN };
 
-    sf::RenderWindow&   render_window;
-    std::string         texture_path;
-    sf::FloatRect       board_local_bound;
-    Piece::COLOR        color;
-    bool                is_alive = true;
-    float               square_length;
+    sf::RenderWindow&       render_window;
+    std::string             texture_path;
+    sf::FloatRect           board_local_bound;
+    Piece::COLOR            color;
+    bool                    is_alive = true;
+    float                   square_length;
+    std::vector<Coordinate> legal_moves;
 
     Piece(
         sf::RenderWindow& render_window,
@@ -31,8 +32,9 @@ public:
     );
 
     virtual ~Piece();
-    virtual TYPE                    get_type() const = 0;
-    virtual std::vector<Coordinate> get_legal_moves(Board& board) = 0;
+
+    virtual TYPE get_type() const = 0;
+    virtual void set_legal_moves(Board& board) = 0;
 
     void draw();
     void set_coordinate(int row, int col);

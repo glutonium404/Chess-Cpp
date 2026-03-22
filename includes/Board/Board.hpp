@@ -68,6 +68,8 @@ private:
     void        highlight_legal_moves(const std::shared_ptr<Piece>& piece);
     void        remove_existing_highilights();
     void        make_move(Square& new_square);
+    void        toggle_player();
+    void        update_legal_moves();
 
     Coordinate  get_clicked_coordinate();
 

@@ -14,6 +14,7 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
     set_squares();
     set_pieces();
     add_pieces_to_board();
+    update_legal_moves();
 }
 
 void Board::handle_event(sf::Event& event) {
@@ -56,7 +57,8 @@ void Board::handle_click(sf::Event& event) {
         selected_square->unhighlight();
         remove_existing_highilights();
         make_move(new_selected_square);
-        current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
+        toggle_player();
+        update_legal_moves();
         return;
     }
 
@@ -93,7 +95,7 @@ void Board::handle_click(sf::Event& event) {
 }
 
 void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
-    highlighted_coord = piece->get_legal_moves(*this);
+    highlighted_coord = piece->legal_moves;
 
     for(auto& coord: highlighted_coord) {
         auto& sq = get_square(coord);
@@ -111,8 +113,6 @@ void Board::remove_existing_highilights() {
     for(auto& coord: highlighted_coord) {
         get_square(coord).unhighlight();
     }
-
-    highlighted_coord.clear();
 }
 
 
@@ -147,10 +147,26 @@ void Board::make_move(Square& new_square) {
     selected_square->piece = nullptr;
 }
 
+void Board::update_legal_moves() {
+    for(auto& piece: w_pieces) {
+        piece->legal_moves.clear();
+        piece->set_legal_moves(*this);
+    }
+
+    for(auto& piece: b_pieces) {
+        piece->legal_moves.clear();
+        piece->set_legal_moves(*this);
+    }
+}
+
 Board::Square& Board::get_square(int row, int col) {
     return squares[row - 1][col - 1];
 }
 
 Board::Square& Board::get_square(const Coordinate& coord) {
     return get_square(coord.row, coord.col);
+}
+
+void Board::toggle_player() {
+    current_turn = (current_turn == Piece::COLOR::WHITE) ? Piece::COLOR::BLACK : Piece::COLOR::WHITE;
 }
