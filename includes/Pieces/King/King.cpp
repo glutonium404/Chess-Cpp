@@ -31,7 +31,7 @@ void King::set_legal_moves(Board& board) {
 
     for(auto& coord: common_lookup_coordinates) {
         if(coord.is_valid()) {
-            add_common_legal_moves(board, legal_moves, coord.row, coord.col);
+            add_common_legal_moves(board, coord.row, coord.col);
         }
     }
 }

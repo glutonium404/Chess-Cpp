@@ -23,10 +23,10 @@ Pawn::Pawn(
 }
 
 void Pawn::set_legal_moves(Board& board) {
-    add_common_legal_moves(board, legal_moves, coordinate.row + (1 * direction), coordinate.col);
+    add_common_legal_moves(board, coordinate.row + (1 * direction), coordinate.col);
 
     if(!has_moved)
-        add_common_legal_moves(board, legal_moves, coordinate.row + (2 * direction), coordinate.col);
+        add_common_legal_moves(board, coordinate.row + (2 * direction), coordinate.col);
 
     Coordinate diagonal_1 = Coordinate(coordinate.row + (1 * direction), coordinate.col + 1);
     Coordinate diagonal_2 = Coordinate(coordinate.row + (1 * direction), coordinate.col - 1);

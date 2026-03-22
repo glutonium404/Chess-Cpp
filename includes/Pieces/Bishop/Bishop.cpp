@@ -20,22 +20,22 @@ void Bishop::set_legal_moves(Board& board) {
 
     // all top-left squares
     for(col = coordinate.col - 1, row = coordinate.row - 1; Coordinate::is_valid(row, col); col--, row--) {
-        if(add_common_legal_moves(board, legal_moves, row, col)) break;
+        if(add_common_legal_moves(board, row, col)) break;
     }
 
     // all top-right squares
     for(col = coordinate.col + 1, row = coordinate.row - 1; Coordinate::is_valid(row, col); col++, row--) {
-        if(add_common_legal_moves(board, legal_moves, row, col)) break;
+        if(add_common_legal_moves(board, row, col)) break;
     }
 
     // all bottom-right squares
     for(col = coordinate.col + 1, row = coordinate.row + 1; Coordinate::is_valid(row, col); col++, row++) {
-        if(add_common_legal_moves(board, legal_moves, row, col)) break;
+        if(add_common_legal_moves(board, row, col)) break;
     }
 
     // all bottom-left squares
     for(col = coordinate.col - 1, row = coordinate.row + 1; Coordinate::is_valid(row, col); col--, row++) {
-        if(add_common_legal_moves(board, legal_moves, row, col)) break;
+        if(add_common_legal_moves(board, row, col)) break;
     }
 }
 

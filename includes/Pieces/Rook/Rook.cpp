@@ -19,25 +19,25 @@ void Rook::set_legal_moves(Board& board) {
 
     // all left squares
     for(col = coordinate.col - 1; col > 0; col--) {
-        if(add_common_legal_moves(board, legal_moves, coordinate.row, col))
+        if(add_common_legal_moves(board, coordinate.row, col))
             break;
     }
 
     // all right squares
     for(col = coordinate.col + 1; col < 9; col++) {
-        if(add_common_legal_moves(board, legal_moves, coordinate.row, col))
+        if(add_common_legal_moves(board, coordinate.row, col))
             break;
     }
 
     // all top squares
     for(row = coordinate.row - 1; row > 0; row--) {
-        if(add_common_legal_moves(board, legal_moves, row, coordinate.col))
+        if(add_common_legal_moves(board, row, coordinate.col))
             break;
     }
 
     // all bottom squares
     for(row = coordinate.row + 1; row < 9; row++) {
-        if(add_common_legal_moves(board, legal_moves, row, coordinate.col))
+        if(add_common_legal_moves(board, row, coordinate.col))
             break;
     }
 }

@@ -79,7 +79,7 @@ void Piece::setup_sprite() {
     sprite.setOrigin(local_bound.width / 2.f, local_bound.height / 2.f);
 }
 
-bool Piece::add_common_legal_moves(Board& board, std::vector<Coordinate>& legal_moves, const int row, const int col) const {
+bool Piece::add_common_legal_moves(Board& board, const int row, const int col) {
     auto& piece = board.get_square(row, col).piece;
 
     if(piece && piece->color == board.current_turn) return true;

@@ -54,5 +54,5 @@ protected:
     Coordinate coordinate;
     bool       has_moved = false;
 
-    bool add_common_legal_moves(Board& board, std::vector<Coordinate>& legal_moves, const int row, const int col) const;
+    bool add_common_legal_moves(Board& board, const int row, const int col);
 };
