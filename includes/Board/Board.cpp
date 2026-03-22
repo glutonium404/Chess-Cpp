@@ -64,7 +64,6 @@ void Board::handle_click(sf::Event& event) {
 
     // if a player piece was clicked
     if(new_selected_square.piece->color == current_turn) {
-
         // return is the same piece is clicked again
         if(selected_square == &new_selected_square) {
             return;
@@ -106,11 +105,15 @@ void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
             sq.highlight();
         }
     }
-
 }
 
 void Board::remove_existing_highilights() {
     for(auto& coord: highlighted_coord) {
+        auto& sq = get_square(coord);
+        // if the square holds a king in check then don't unhighlight
+        if(sq.piece && sq.piece->get_type() == Piece::TYPE::KING && sq.piece->attacked_by.size() > 0) {
+            continue;
+        }
         get_square(coord).unhighlight();
     }
 }
@@ -148,6 +151,9 @@ void Board::make_move(Square& new_square) {
 }
 
 void Board::update_legal_moves() {
+    for(auto& piece: w_pieces) piece->attacked_by.clear();
+    for(auto& piece: b_pieces) piece->attacked_by.clear();
+
     for(auto& piece: w_pieces) {
         piece->legal_moves.clear();
         piece->set_legal_moves(*this);

@@ -49,6 +49,7 @@ void Pawn::set_legal_moves(Board& board) {
 
             if(sq.piece && sq.piece->color != color) {
                 legal_moves.push_back({ forward_row, diag_col });
+                sq.piece->attacked_by.push_back(this);
             }
         }
     }

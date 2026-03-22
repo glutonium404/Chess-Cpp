@@ -83,7 +83,13 @@ bool Piece::add_common_legal_moves(Board& board, const int row, const int col) {
     auto& piece = board.get_square(row, col).piece;
 
     if(piece && piece->color == color) return true;
+
     legal_moves.push_back({ row, col });
-    if(piece && piece->color != color) return true;
+
+    if(piece && piece->color != color) {
+        piece->attacked_by.push_back(this);
+        return true;
+    }
+
     return false;
 }

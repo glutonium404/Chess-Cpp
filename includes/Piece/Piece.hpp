@@ -22,6 +22,7 @@ public:
     bool                    is_alive = true;
     float                   square_length;
     std::vector<Coordinate> legal_moves;
+    std::vector<Piece*>     attacked_by;
 
     Piece(
         sf::RenderWindow& render_window,
