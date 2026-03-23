@@ -15,30 +15,18 @@ Rook::Rook(
 ) {}
 
 void Rook::set_legal_moves(Board& board) {
-    int col, row;
+    std::vector<Coordinate> directions = {
+        { 0, -1}, // left
+        { 0,  1}, // right
+        {-1,  0}, // top
+        { 1,  0}, // bottom
+    };
 
-    // all left squares
-    for(col = coordinate.col - 1; col > 0; col--) {
-        if(add_common_legal_moves(board, coordinate.row, col))
-            break;
-    }
-
-    // all right squares
-    for(col = coordinate.col + 1; col < 9; col++) {
-        if(add_common_legal_moves(board, coordinate.row, col))
-            break;
-    }
-
-    // all top squares
-    for(row = coordinate.row - 1; row > 0; row--) {
-        if(add_common_legal_moves(board, row, coordinate.col))
-            break;
-    }
-
-    // all bottom squares
-    for(row = coordinate.row + 1; row < 9; row++) {
-        if(add_common_legal_moves(board, row, coordinate.col))
-            break;
+    for(auto& dir: directions) {
+        for(Coordinate curr_coord = coordinate + dir; curr_coord.is_valid(); curr_coord += dir) {
+            if(add_common_legal_moves(board, curr_coord.row, curr_coord.col))
+                break;
+        }
     }
 }
 

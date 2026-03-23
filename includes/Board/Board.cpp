@@ -112,10 +112,6 @@ void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
 void Board::remove_existing_highilights() {
     for(auto& coord: highlighted_coord) {
         auto& sq = get_square(coord);
-        // if the square holds a king in check then don't unhighlight
-        if(sq.piece && sq.piece->get_type() == Piece::TYPE::KING && sq.piece->attacked_by.size() > 0) {
-            continue;
-        }
         get_square(coord).unhighlight();
     }
 }

@@ -1,4 +1,6 @@
 #include "Queen.hpp"
+#include <my_utils.hpp>
+#include <vector>
 
 Queen::Queen(
     sf::RenderWindow&   render_window,
@@ -16,54 +18,22 @@ Queen::Queen(
 
 
 void Queen::set_legal_moves(Board& board) {
-    int col, row;
+    std::vector<Coordinate> directions = {
+        { 0, -1}, // left
+        { 0,  1}, // right
+        {-1,  0}, // top
+        { 1,  0}, // bottom
+        {-1, -1}, // top-left
+        {-1,  1}, // top-right
+        { 1,  1}, // bottom-right
+        { 1, -1}  // bottom-left
+    };
 
-    // all left squares
-    for(col = coordinate.col - 1; col > 0; col--) {
-        if(add_common_legal_moves(board, coordinate.row, col))
-            break;
-    }
-
-    // all right squares
-    for(col = coordinate.col + 1; col < 9; col++) {
-        if(add_common_legal_moves(board, coordinate.row, col))
-            break;
-    }
-
-    // all top squares
-    for(row = coordinate.row - 1; row > 0; row--) {
-        if(add_common_legal_moves(board, row, coordinate.col))
-            break;
-    }
-
-    // all bottom squares
-    for(row = coordinate.row + 1; row < 9; row++) {
-        if(add_common_legal_moves(board, row, coordinate.col))
-            break;
-    }
-
-    // all top-left squares
-    for(col = coordinate.col - 1, row = coordinate.row - 1; Coordinate::is_valid(row, col); col--, row--) {
-        if(add_common_legal_moves(board, row, col))
-            break;
-    }
-
-    // all top-right squares
-    for(col = coordinate.col + 1, row = coordinate.row - 1; Coordinate::is_valid(row, col); col++, row--) {
-        if(add_common_legal_moves(board, row, col))
-            break;
-    }
-
-    // all bottom-right squares
-    for(col = coordinate.col + 1, row = coordinate.row + 1; Coordinate::is_valid(row, col); col++, row++) {
-        if(add_common_legal_moves(board, row, col))
-            break;
-    }
-
-    // all bottom-left squares
-    for(col = coordinate.col - 1, row = coordinate.row + 1; Coordinate::is_valid(row, col); col--, row++) {
-        if(add_common_legal_moves(board, row, col))
-            break;
+    for(auto& dir: directions) {
+        for(Coordinate curr_coord = coordinate + dir; curr_coord.is_valid(); curr_coord += dir) {
+            if(add_common_legal_moves(board, curr_coord.row, curr_coord.col))
+                break;
+        }
     }
 }
 

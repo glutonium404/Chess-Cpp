@@ -11,6 +11,9 @@ struct Coordinate {
     bool operator==(const Coordinate& other) const;
     bool operator!=(const Coordinate& other) const;
 
+    Coordinate operator+(const Coordinate& other) const;
+    void operator+=(const Coordinate& other);
+
     bool is_valid() const;
     std::string log() const;
 
