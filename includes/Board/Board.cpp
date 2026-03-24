@@ -168,13 +168,28 @@ void Board::make_move(Square& new_square) {
     selected_square->piece = nullptr;
 }
 
+// in set legal moves, we have to check if the king is in check or not
+// this is checked through attacked_by.size()
+// so essentially, for the player, whose king may be in check, in order to calculate the players legal moves
+// we need to first know how many opponents pieces are attacking/checking players king at that moment
+// and for that the oppoents legal moves need to be calculated first
+// due to this dependancy, we are first calculating the opponents legal moves
+// which populates the players kings attacked_by
+// and then with that up-to-date value we can safely use the variable
 void Board::update_legal_moves() {
-    for(auto& piece: w_pieces) {
+    auto& first_batch  = (current_turn == Piece::COLOR::WHITE) ? b_pieces : w_pieces;
+    auto& second_batch = (current_turn == Piece::COLOR::WHITE) ? w_pieces : b_pieces;
+
+    for(auto& piece: first_batch) {
+        if(!piece->is_alive) continue;
+
         piece->legal_moves.clear();
         piece->set_legal_moves(*this);
     }
 
-    for(auto& piece: b_pieces) {
+    for(auto& piece: second_batch) {
+        if(!piece->is_alive) continue;
+
         piece->legal_moves.clear();
         piece->set_legal_moves(*this);
     }
