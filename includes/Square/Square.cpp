@@ -1,27 +1,28 @@
-#include "Board.hpp"
+#include "Square.hpp"
+#include "../Piece/Piece.hpp"
 
-void Board::Square::highlight(const sf::Color& color) {
+void Square::highlight(const sf::Color& color) {
     shape.setFillColor(color);
 }
 
-void Board::Square::highlight() {
+void Square::highlight() {
     shape.setFillColor(
         type == COLOR::LIGHT ? Square::light_highlight : Square::dark_highlight
     );
 }
 
-void Board::Square::unhighlight() {
+void Square::unhighlight() {
     shape.setFillColor(
         type == COLOR::LIGHT ? Square::light_color : Square::dark_color
     );
 }
 
-void Board::Square::draw(const Board& board) {
-    board.render_window.draw(shape);
+void Square::draw(sf::RenderWindow& render_window) {
+    render_window.draw(shape);
     if(piece && piece->is_alive) piece->draw();
 }
 
-bool Board::Square::is_legal_move() const {
+bool Square::is_legal_move() const {
     const sf::Color& color = shape.getFillColor();
     return (color == light_highlight) || (color == dark_highlight) || (color == red_highlight);
 }

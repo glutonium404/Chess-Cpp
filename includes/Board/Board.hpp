@@ -1,44 +1,19 @@
 #pragma once
 
 #include "../Piece/Piece.hpp"
+#include "../Square/Square.hpp"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Mouse.hpp>
-#include <array>
 #include <memory>
+#include <array>
+#include <vector>
 
 class Board {
 public:
-    struct Square {
-        enum class COLOR { LIGHT, DARK, RED };
-
-        inline static const sf::Color light_color     = sf::Color(235, 236, 208);
-        inline static const sf::Color dark_color      = sf::Color(115, 149, 82);
-
-        inline static const sf::Color light_highlight = sf::Color(245, 246, 130);
-        inline static const sf::Color dark_highlight  = sf::Color(185, 202, 67);
-        inline static const sf::Color red_highlight   = sf::Color(149, 82, 82);
-        inline static const sf::Color check_highlight = sf::Color(235, 61, 61);
-
-        COLOR                   type;
-        Coordinate              coordinate = Coordinate(0, 0);
-        sf::RectangleShape      shape;
-        std::shared_ptr<Piece>  piece = nullptr;
-
-        bool is_controlled_by_white = false;
-        bool is_controlled_by_black = false;
-
-        void highlight();
-        void highlight(const sf::Color& color);
-        void unhighlight();
-        void draw(const Board& board);
-
-        bool is_legal_move() const;
-    };
-
     float             square_length;
     sf::RenderWindow& render_window;
     sf::FloatRect     board_local_bound;
@@ -59,8 +34,8 @@ private:
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
 
-    std::vector<std::shared_ptr<Piece>> b_pieces;
-    std::vector<std::shared_ptr<Piece>> w_pieces;
+    std::vector<std::shared_ptr<Piece>>     b_pieces;
+    std::vector<std::shared_ptr<Piece>>     w_pieces;
 
     Square* selected_square = nullptr;
 

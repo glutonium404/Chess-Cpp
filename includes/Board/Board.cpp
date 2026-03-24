@@ -25,7 +25,7 @@ void Board::handle_event(sf::Event& event) {
 void Board::draw() {
     for(auto& square_array: squares) {
         for(auto& square: square_array) {
-            square.draw(*this);
+            square.draw(render_window);
         }
     }
 }
@@ -180,11 +180,11 @@ void Board::update_legal_moves() {
     }
 }
 
-Board::Square& Board::get_square(int row, int col) {
+Square& Board::get_square(int row, int col) {
     return squares[row - 1][col - 1];
 }
 
-Board::Square& Board::get_square(const Coordinate& coord) {
+Square& Board::get_square(const Coordinate& coord) {
     return get_square(coord.row, coord.col);
 }
 
