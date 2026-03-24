@@ -215,8 +215,15 @@ void Board::reset_variables() {
         }
     }
 
-    for(auto& piece: w_pieces) piece->attacked_by.clear();
-    for(auto& piece: b_pieces) piece->attacked_by.clear();
+    for(auto& piece: w_pieces) {
+        if(!piece->is_alive) continue;
+        piece->attacked_by.clear();
+    }
+
+    for(auto& piece: b_pieces) {
+        if(!piece->is_alive) continue;
+        piece->attacked_by.clear();
+    }
 }
 
 const std::shared_ptr<Piece>& Board::get_king(const Piece::COLOR color) const {

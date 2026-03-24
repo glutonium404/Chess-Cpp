@@ -1,6 +1,8 @@
 #include "Piece.hpp"
 #include "../Board/Board.hpp"
 #include <iostream>
+#include <memory>
+#include <my_utils.hpp>
 
 Piece::~Piece() {}
 
@@ -97,4 +99,45 @@ bool Piece::add_common_legal_moves(Board& board, const int row, const int col) {
     }
 
     return false;
+}
+
+std::vector<Coordinate> Piece::get_check_elimination_moves(
+    const Piece* const attacker,
+    const std::shared_ptr<Piece>& king
+) {
+    if(!attacker || !king) return {};
+
+    // knights and pawns check can't be blocked
+    // so the only way to eliminate those checks without moving the king
+    // is to capture those pieces
+    if(attacker->get_type() == Piece::TYPE::KNIGHT || attacker->get_type() == Piece::TYPE::PAWN) {
+        for(const auto& move : legal_moves) {
+            if(move == attacker->get_coordinate()) {
+                return {move};
+            }
+        }
+        return {};
+    }
+
+    // if attacker is not a knight or a pawn, then there are two ways to eliminate checks
+    // 1. block the check
+    // 2. capture the attacking piece
+    //
+    // to do this, we traverse from the attacker towards the king or the line of attack
+    // and check which of the moves intersect
+    // intersecitng / overlapping moves are the ones that can block the check
+    const Coordinate& attacker_coord = attacker->get_coordinate();
+    const Coordinate& kings_coord    = king->get_coordinate();
+    const Coordinate& attacking_dir  = (kings_coord - attacker_coord).getStepValues();
+
+    std::vector<Coordinate> filtered;
+
+    for(auto coord = attacker_coord; coord != kings_coord; coord += attacking_dir) {
+        for(const auto& move : legal_moves) {
+            if(move == coord)
+                filtered.push_back(coord);
+        }
+    }
+
+    return filtered;
 }

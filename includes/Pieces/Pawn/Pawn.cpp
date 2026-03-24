@@ -23,8 +23,10 @@ Pawn::Pawn(
 }
 
 void Pawn::set_legal_moves(Board& board) {
+    auto& kings_attackers = board.get_king(color)->attacked_by;
+
     // in terms of double check, the king must be moved hence no other piece has any valid moves
-    if(board.get_king(color)->attacked_by.size() > 1) return;
+    if(kings_attackers.size() > 1) return;
 
     int forward_row = coordinate.row + direction;
 
@@ -60,6 +62,11 @@ void Pawn::set_legal_moves(Board& board) {
                     sq.is_controlled_by_black = true;
             }
         }
+    }
+
+    if(kings_attackers.size() > 0) {
+        const auto& attacker = kings_attackers[0];
+        legal_moves = get_check_elimination_moves(attacker, board.get_king(color));
     }
 }
 

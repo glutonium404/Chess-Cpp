@@ -16,8 +16,10 @@ Rook::Rook(
 ) {}
 
 void Rook::set_legal_moves(Board& board) {
+    auto& kings_attackers = board.get_king(color)->attacked_by;
+
     // in terms of double check, the king must be moved hence no other piece has any valid moves
-    if(board.get_king(color)->attacked_by.size() > 1) return;
+    if(kings_attackers.size() > 1) return;
 
     std::vector<Coordinate> directions = {
         { 0, -1}, // left
@@ -31,6 +33,16 @@ void Rook::set_legal_moves(Board& board) {
             if(add_common_legal_moves(board, curr_coord.row, curr_coord.col))
                 break;
         }
+    }
+
+    // if there is a check on king that is not a double check,
+    // the only valid moves are the ones that block the check or eliminates the attacker
+    // through finding the intersection between both the piece and the attackers legal move,
+    // we can determine which moves intersect the check. filter_legal_moves() does exactly that
+    if(kings_attackers.size() > 0) {
+        // if not double check then there is only one attacker
+        auto& attacker = kings_attackers[0];
+        legal_moves = get_check_elimination_moves(attacker, board.get_king(color));
     }
 }
 

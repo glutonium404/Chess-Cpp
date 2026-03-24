@@ -56,4 +56,5 @@ protected:
     bool       has_moved = false;
 
     bool add_common_legal_moves(Board& board, const int row, const int col);
+    std::vector<Coordinate> get_check_elimination_moves(const Piece* const attacker, const std::shared_ptr<Piece>& king);
 };

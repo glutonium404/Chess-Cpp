@@ -23,9 +23,20 @@ Coordinate Coordinate::operator+(const Coordinate& other) const {
     return Coordinate(row + other.row, col + other.col);
 }
 
+Coordinate Coordinate::operator-(const Coordinate& other) const {
+    return Coordinate(row - other.row, col - other.col);
+}
+
 void Coordinate::operator+=(const Coordinate& other) {
     row += other.row;
     col += other.col;
+}
+
+Coordinate Coordinate::getStepValues() const {
+    return {
+        (row > 0) - (row < 0),
+        (col > 0) - (col < 0),
+    };
 }
 
 std::string Coordinate::log() const {
