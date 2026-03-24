@@ -39,13 +39,13 @@ void Board::handle_click(sf::Event& event) {
 
     // ======= EMPTY SQUARE (square without peice or highlight) ======
 
-    if(!new_selected_square.piece && !new_selected_square.is_a_legal_moves(*this)) {
+    if(!new_selected_square.piece && !new_selected_square.is_highlighted()) {
         empty_square_clicked();
         return;
     }
 
     // if a highlighted square is clicked
-    if(new_selected_square.is_a_legal_moves(*this)) {
+    if(new_selected_square.is_highlighted()) {
         highlighted_square_clicked(new_selected_square);
         return;
     }

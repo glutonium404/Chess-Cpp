@@ -35,7 +35,7 @@ public:
         void unhighlight();
         void draw(const Board& board);
 
-        bool is_a_legal_moves(const Board& board) const;
+        bool is_highlighted() const;
     };
 
     float             square_length;

@@ -21,7 +21,7 @@ void Board::Square::draw(const Board& board) {
     if(piece && piece->is_alive) piece->draw();
 }
 
-bool Board::Square::is_a_legal_moves(const Board& board) const {
-    auto it = std::find(board.highlighted_coord.begin(), board.highlighted_coord.end(), coordinate);
-    return it != board.highlighted_coord.end();
+bool Board::Square::is_highlighted() const {
+    const sf::Color& color = shape.getFillColor();
+    return (color == light_highlight) || (color == dark_highlight) || (color == red_highlight);
 }
