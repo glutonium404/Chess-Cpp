@@ -37,29 +37,35 @@ void Board::handle_click(sf::Event& event) {
 
     Square& new_selected_square = get_square(clicked_coordinate);
 
+    // return is the same piece is clicked again
+    if(selected_square == &new_selected_square) return;
+
     // ======= EMPTY SQUARE (square without peice or highlight) ======
 
-    if(!new_selected_square.piece && !new_selected_square.is_highlighted()) {
+    if(!new_selected_square.piece && !new_selected_square.is_legal_move()) {
         empty_square_clicked();
+        manage_check_highlights();
         return;
     }
 
     // if a highlighted square is clicked
-    if(new_selected_square.is_highlighted()) {
+    if(new_selected_square.is_legal_move()) {
         highlighted_square_clicked(new_selected_square);
+        manage_check_highlights();
         return;
     }
 
     // if a player piece was clicked
     if(new_selected_square.piece->color == current_turn) {
         own_piece_clicked(new_selected_square);
+        manage_check_highlights();
         return;
     }
 
     // opposition piece that is not highlighted was clicked
     empty_square_clicked();
+    manage_check_highlights();
 }
-
 
 void Board::empty_square_clicked() {
     // remove all highlights except checks (TODO: check logic) and reset selected_square
@@ -81,11 +87,6 @@ void Board::highlighted_square_clicked(Square& new_selected_square) {
 }
 
 void Board::own_piece_clicked(Square& new_selected_square) {
-    // return is the same piece is clicked again
-    if(selected_square == &new_selected_square) {
-        return;
-    }
-
     // remove highlights if any previous player piece was selected
     if(selected_square) {
         selected_square->unhighlight();
@@ -96,6 +97,21 @@ void Board::own_piece_clicked(Square& new_selected_square) {
     new_selected_square.highlight();
     highlight_legal_moves(new_selected_square.piece);
     selected_square = &new_selected_square;
+}
+
+void Board::manage_check_highlights() {
+    auto& w_king = get_king(Piece::COLOR::WHITE);
+    auto& b_king = get_king(Piece::COLOR::BLACK);
+
+    if(w_king->attacked_by.size() > 0)
+        get_square(w_king->get_coordinate()).highlight(Square::check_highlight);
+    else
+        get_square(w_king->get_coordinate()).unhighlight();
+
+    if(b_king->attacked_by.size() > 0)
+        get_square(b_king->get_coordinate()).highlight(Square::check_highlight);
+    else
+        get_square(b_king->get_coordinate()).unhighlight();
 }
 
 void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {

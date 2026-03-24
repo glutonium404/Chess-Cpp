@@ -15,12 +15,13 @@ public:
     struct Square {
         enum class COLOR { LIGHT, DARK, RED };
 
-        inline static const sf::Color light_color      = sf::Color(235, 236, 208);
-        inline static const sf::Color dark_color       = sf::Color(115, 149, 82);
+        inline static const sf::Color light_color     = sf::Color(235, 236, 208);
+        inline static const sf::Color dark_color      = sf::Color(115, 149, 82);
 
-        inline static const sf::Color light_highlight  = sf::Color(245, 246, 130);
-        inline static const sf::Color dark_highlight   = sf::Color(185, 202, 67);
-        inline static const sf::Color red_highlight    = sf::Color(149, 82, 82);
+        inline static const sf::Color light_highlight = sf::Color(245, 246, 130);
+        inline static const sf::Color dark_highlight  = sf::Color(185, 202, 67);
+        inline static const sf::Color red_highlight   = sf::Color(149, 82, 82);
+        inline static const sf::Color check_highlight = sf::Color(235, 61, 61);
 
         COLOR                   type;
         Coordinate              coordinate = Coordinate(0, 0);
@@ -35,7 +36,7 @@ public:
         void unhighlight();
         void draw(const Board& board);
 
-        bool is_highlighted() const;
+        bool is_legal_move() const;
     };
 
     float             square_length;
@@ -79,6 +80,7 @@ private:
     void    empty_square_clicked();
     void    highlighted_square_clicked(Square& new_selected_square);
     void    own_piece_clicked(Square& new_selected_square);
+    void    manage_check_highlights();
 
     Coordinate  get_clicked_coordinate();
 

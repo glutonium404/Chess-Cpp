@@ -21,7 +21,7 @@ void Board::Square::draw(const Board& board) {
     if(piece && piece->is_alive) piece->draw();
 }
 
-bool Board::Square::is_highlighted() const {
+bool Board::Square::is_legal_move() const {
     const sf::Color& color = shape.getFillColor();
     return (color == light_highlight) || (color == dark_highlight) || (color == red_highlight);
 }
