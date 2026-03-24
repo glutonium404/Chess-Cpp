@@ -3,7 +3,6 @@
 #include <SFML/Window/Event.hpp>
 #include <memory>
 #include <my_utils.hpp>
-#include <ostream>
 
 Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
     w_pieces.reserve(16);
@@ -41,51 +40,28 @@ void Board::handle_click(sf::Event& event) {
     // ======= EMPTY SQUARE (square without peice or highlight) ======
 
     if(!new_selected_square.piece && !new_selected_square.is_a_legal_moves(*this)) {
-        remove_existing_highilights();
-
-        if(selected_square) {
-            selected_square->unhighlight();
-            selected_square = nullptr;
-        }
-
+        empty_square_clicked();
         return;
     }
 
-    // ====== EIHTER A PIECE OR A HIGHLIGHT SQUARE IS CLICKED =====
-
     // if a highlighted square is clicked
-    if(!new_selected_square.piece) {
-        selected_square->unhighlight();
-        remove_existing_highilights();
-        make_move(new_selected_square);
-        toggle_player();
-        reset_variables(); // call this before updating legal moves
-        update_legal_moves();
+    if(new_selected_square.is_a_legal_moves(*this)) {
+        highlighted_square_clicked(new_selected_square);
         return;
     }
 
     // if a player piece was clicked
     if(new_selected_square.piece->color == current_turn) {
-        // return is the same piece is clicked again
-        if(selected_square == &new_selected_square) {
-            return;
-        }
-
-        // remove highlights if any previous player piece was selected
-        if(selected_square) {
-            selected_square->unhighlight();
-            remove_existing_highilights();
-        }
-
-        // highlight newly selected square piece and its possible moves
-        new_selected_square.highlight();
-        highlight_legal_moves(new_selected_square.piece);
-        selected_square = &new_selected_square;
+        own_piece_clicked(new_selected_square);
         return;
     }
 
-    // opposition piece was clicked
+    // opposition piece that is not highlighted was clicked
+    empty_square_clicked();
+}
 
+
+void Board::empty_square_clicked() {
     // remove all highlights except checks (TODO: check logic) and reset selected_square
     remove_existing_highilights();
 
@@ -93,6 +69,33 @@ void Board::handle_click(sf::Event& event) {
         selected_square->unhighlight();
         selected_square = nullptr;
     }
+}
+
+void Board::highlighted_square_clicked(Square& new_selected_square) {
+    selected_square->unhighlight();
+    remove_existing_highilights();
+    make_move(new_selected_square);
+    toggle_player();
+    reset_variables(); // call this before updating legal moves
+    update_legal_moves();
+}
+
+void Board::own_piece_clicked(Square& new_selected_square) {
+    // return is the same piece is clicked again
+    if(selected_square == &new_selected_square) {
+        return;
+    }
+
+    // remove highlights if any previous player piece was selected
+    if(selected_square) {
+        selected_square->unhighlight();
+        remove_existing_highilights();
+    }
+
+    // highlight newly selected square piece and its possible moves
+    new_selected_square.highlight();
+    highlight_legal_moves(new_selected_square.piece);
+    selected_square = &new_selected_square;
 }
 
 void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
@@ -111,7 +114,6 @@ void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
 
 void Board::remove_existing_highilights() {
     for(auto& coord: highlighted_coord) {
-        auto& sq = get_square(coord);
         get_square(coord).unhighlight();
     }
 }
@@ -142,6 +144,8 @@ Coordinate Board::get_clicked_coordinate() {
 
 void Board::make_move(Square& new_square) {
     if(!selected_square || !selected_square->piece) return;
+
+    if(new_square.piece && new_square.piece->color != current_turn) new_square.piece->is_alive = false;
 
     new_square.piece = selected_square->piece;
     new_square.piece->set_coordinate(new_square.coordinate);
@@ -182,4 +186,8 @@ void Board::reset_variables() {
 
     for(auto& piece: w_pieces) piece->attacked_by.clear();
     for(auto& piece: b_pieces) piece->attacked_by.clear();
+}
+
+const std::shared_ptr<Piece>& Board::get_king(const Piece::COLOR color) const {
+    return color == Piece::COLOR::WHITE ? w_pieces.back() : b_pieces.back();
 }

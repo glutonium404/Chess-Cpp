@@ -27,23 +27,21 @@ public:
         sf::RectangleShape      shape;
         std::shared_ptr<Piece>  piece = nullptr;
 
+        bool is_controlled_by_white = false;
+        bool is_controlled_by_black = false;
+
         void highlight();
         void highlight(const sf::Color& color);
         void unhighlight();
         void draw(const Board& board);
 
-        bool is_controlled_by_white = false;
-        bool is_controlled_by_black = false;
-
         bool is_a_legal_moves(const Board& board) const;
     };
 
-    float                               square_length;
-    sf::RenderWindow&                   render_window;
-    sf::FloatRect                       board_local_bound;
-    std::vector<std::shared_ptr<Piece>> b_pieces;
-    std::vector<std::shared_ptr<Piece>> w_pieces;
-    Piece::COLOR                        current_turn = Piece::COLOR::WHITE;
+    float             square_length;
+    sf::RenderWindow& render_window;
+    sf::FloatRect     board_local_bound;
+    Piece::COLOR      current_turn = Piece::COLOR::WHITE;
 
     Board(float board_width, sf::RenderWindow& render_window);
 
@@ -53,27 +51,34 @@ public:
     Square& get_square(const Coordinate& coordinate);
     Square& get_square(int row, int col);
 
+    const std::shared_ptr<Piece>& get_king(const Piece::COLOR color) const;
 
 private:
     sf::Mouse                               mouse;
     std::vector<Coordinate>                 highlighted_coord;
     std::array<std::array<Square, 8>, 8>    squares;
 
-    Square*      selected_square = nullptr;
+    std::vector<std::shared_ptr<Piece>> b_pieces;
+    std::vector<std::shared_ptr<Piece>> w_pieces;
 
-    bool        is_mouse_clicked(sf::Event& event) const;
+    Square* selected_square = nullptr;
 
-    void        handle_click(sf::Event& event);
-    void        set_board_local_bound(float& board_width);
-    void        set_squares();
-    void        set_pieces();
-    void        add_pieces_to_board();
-    void        highlight_legal_moves(const std::shared_ptr<Piece>& piece);
-    void        remove_existing_highilights();
-    void        make_move(Square& new_square);
-    void        toggle_player();
-    void        update_legal_moves();
-    void        reset_variables();
+    bool    is_mouse_clicked(sf::Event& event) const;
+
+    void    handle_click(sf::Event& event);
+    void    set_board_local_bound(float& board_width);
+    void    set_squares();
+    void    set_pieces();
+    void    add_pieces_to_board();
+    void    highlight_legal_moves(const std::shared_ptr<Piece>& piece);
+    void    remove_existing_highilights();
+    void    make_move(Square& new_square);
+    void    toggle_player();
+    void    update_legal_moves();
+    void    reset_variables();
+    void    empty_square_clicked();
+    void    highlighted_square_clicked(Square& new_selected_square);
+    void    own_piece_clicked(Square& new_selected_square);
 
     Coordinate  get_clicked_coordinate();
 
