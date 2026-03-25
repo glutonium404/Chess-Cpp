@@ -32,10 +32,10 @@ void King::set_legal_moves(Board& board) {
     for(auto& coord: common_lookup_coordinates) {
         if(coord.is_valid()) {
             auto& sq = board.get_square(coord);
-            if(
-                (color == Piece::COLOR::WHITE && !sq.is_controlled_by_black) ||
-                (color == Piece::COLOR::BLACK && !sq.is_controlled_by_white)
-            )
+
+            set_controlled_squares(board, coord);
+
+            if(( is_white() && !sq.is_controlled_by_black ) || ( is_black() && !sq.is_controlled_by_white ))
                 add_common_legal_moves(board, coord.row, coord.col);
         }
     }

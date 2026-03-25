@@ -27,6 +27,10 @@ Coordinate Coordinate::operator-(const Coordinate& other) const {
     return Coordinate(row - other.row, col - other.col);
 }
 
+Coordinate Coordinate::operator*(const int scalar) const {
+    return Coordinate(row * scalar, col * scalar);
+}
+
 void Coordinate::operator+=(const Coordinate& other) {
     row += other.row;
     col += other.col;

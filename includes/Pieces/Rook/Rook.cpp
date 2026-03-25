@@ -30,6 +30,14 @@ void Rook::set_legal_moves(Board& board) {
 
     for(auto& dir: directions) {
         for(Coordinate curr_coord = coordinate + dir; curr_coord.is_valid(); curr_coord += dir) {
+            set_controlled_squares(board, curr_coord);
+
+            if(is_pinned && (dir != pinned_dir && dir != (pinned_dir * -1))) {
+                // if the piece is pinned, it can only move in the direction of the pin or the opposite direction
+                // so we skip any direction that is not the direction of the pin or the opposite direction
+                continue;
+            }
+
             if(add_common_legal_moves(board, curr_coord.row, curr_coord.col))
                 break;
         }

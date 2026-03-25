@@ -13,6 +13,7 @@ struct Coordinate {
 
     Coordinate operator+(const Coordinate& other) const;
     Coordinate operator-(const Coordinate& other) const;
+    Coordinate operator*(const int scalar) const;
     void operator+=(const Coordinate& other);
 
     bool is_valid() const;

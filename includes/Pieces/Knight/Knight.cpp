@@ -36,9 +36,17 @@ void Knight::set_legal_moves(Board& board) {
     };
 
     for(auto& coord: common_legal_moves) {
-        if(coord.is_valid())
-            add_common_legal_moves(board, coord.row, coord.col);
+        if(coord.is_valid()) {
+            set_controlled_squares(board, coord);
+            // if the knight is pinned, it cannot move at all since no knight move can capture / block check
+            // so we only update the squares controlled by the knight if pinned
+            if(!is_pinned)
+                add_common_legal_moves(board, coord.row, coord.col);
+        }
     }
+
+    // if pinned, no legal moves
+    if(is_pinned) return;
 
     if(kings_attackers.size() > 0) {
         const auto& attacker = kings_attackers[0];

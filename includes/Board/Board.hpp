@@ -51,6 +51,7 @@ private:
     void    make_move(Square& new_square);
     void    toggle_player();
     void    update_legal_moves();
+    void    update_pinned_pieces();
     void    reset_variables();
     void    empty_square_clicked();
     void    highlighted_square_clicked(Square& new_selected_square);

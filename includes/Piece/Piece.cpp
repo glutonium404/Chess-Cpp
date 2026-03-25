@@ -88,11 +88,6 @@ bool Piece::add_common_legal_moves(Board& board, const int row, const int col) {
 
     legal_moves.push_back({ row, col });
 
-    if(color == Piece::COLOR::WHITE)
-        sq.is_controlled_by_white = true;
-    else
-        sq.is_controlled_by_black = true;
-
     if(sq.piece && sq.piece->color != color) {
         sq.piece->attacked_by.push_back(this);
         return true;
@@ -140,4 +135,14 @@ std::vector<Coordinate> Piece::get_check_elimination_moves(
     }
 
     return filtered;
+}
+
+bool Piece::is_white() const { return color == COLOR::WHITE; }
+bool Piece::is_black() const { return color == COLOR::BLACK; }
+
+void Piece::set_controlled_squares(Board& board, Coordinate& coord) const {
+    auto& sq = board.get_square(coord);
+
+    if(is_white()) sq.is_controlled_by_white = true;
+    else           sq.is_controlled_by_black = true;
 }

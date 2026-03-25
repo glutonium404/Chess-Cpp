@@ -82,7 +82,8 @@ void Board::highlighted_square_clicked(Square& new_selected_square) {
     remove_existing_highilights();
     make_move(new_selected_square);
     toggle_player();
-    reset_variables(); // call this before updating legal moves
+    reset_variables(); // call this before updating pinned_pieaces and legal_moves
+    update_pinned_pieces();
     update_legal_moves();
 }
 
@@ -195,6 +196,64 @@ void Board::update_legal_moves() {
     }
 }
 
+// this works as follows,
+// - start from the king and traverse through all 8 direcitons
+// - in each direction if we encounter a piece,
+//   - break (check next dir) if we encounter our own piece twice
+//   - break (check next dir) if we encounter oppo piece without encountering our own piece beforehand
+//   - 
+//   - if we encounter own piece for the first time, store and continue searching for oppo piece in the same dir
+//   - if we encounter own piece and then find oppo piece afterwards,
+//      - check its type. (only Queen, Bishop & Rook can pin) and the corresponding dir (bishop can only pin diagonally)
+//      - if type matches, we have our own_piece pinned by this oppo piece
+void Board::update_pinned_pieces() {
+    std::vector<Coordinate> directions = {
+        { 0, -1}, // left
+        { 0,  1}, // right
+        {-1,  0}, // top
+        { 1,  0}, // bottom
+        {-1, -1}, // top-left
+        {-1,  1}, // top-right
+        { 1,  1}, // bottom-right
+        { 1, -1}  // bottom-left
+    };
+
+    const auto& king_coord = get_king(current_turn)->get_coordinate();
+
+    for(const auto& dir: directions) {
+        std::shared_ptr<Piece> own_piece = nullptr;
+        bool is_diag = (dir.row != 0 && dir.col != 0);
+
+        for(auto coord = king_coord + dir; coord.is_valid(); coord += dir) {
+            auto curr_piece = get_square(coord).piece;
+
+            if(!curr_piece) continue;
+
+            if( own_piece && curr_piece->color == current_turn) break;
+            if(!own_piece && curr_piece->color != current_turn) break;
+
+            if(!own_piece && curr_piece->color == current_turn) {
+                own_piece = curr_piece;
+                continue;
+            }
+
+            if( own_piece && curr_piece->color != current_turn) {
+                auto oppo_piece_type = curr_piece->get_type();
+                if(
+                    oppo_piece_type == Piece::TYPE::QUEEN               ||
+                    (!is_diag && oppo_piece_type == Piece::TYPE::ROOK)  ||
+                    ( is_diag && oppo_piece_type == Piece::TYPE::BISHOP)
+                )
+                {
+                    own_piece->is_pinned = true;
+                    own_piece->pinned_dir = dir;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 Square& Board::get_square(int row, int col) {
     return squares[row - 1][col - 1];
 }
@@ -218,11 +277,13 @@ void Board::reset_variables() {
     for(auto& piece: w_pieces) {
         if(!piece->is_alive) continue;
         piece->attacked_by.clear();
+        piece->is_pinned = false;
     }
 
     for(auto& piece: b_pieces) {
         if(!piece->is_alive) continue;
         piece->attacked_by.clear();
+        piece->is_pinned = false;
     }
 }
 

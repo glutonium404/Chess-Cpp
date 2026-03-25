@@ -17,12 +17,16 @@ public:
 
     sf::RenderWindow&       render_window;
     std::string             texture_path;
+    std::vector<Coordinate> legal_moves;
     sf::FloatRect           board_local_bound;
     Piece::COLOR            color;
+    std::vector<Piece*>     attacked_by;
+
     bool                    is_alive = true;
     float                   square_length;
-    std::vector<Coordinate> legal_moves;
-    std::vector<Piece*>     attacked_by;
+
+    bool                    is_pinned = false;
+    Coordinate              pinned_dir = Coordinate(9, 9);
 
     Piece(
         sf::RenderWindow& render_window,
@@ -41,6 +45,10 @@ public:
     void set_coordinate(int row, int col);
     void set_coordinate(const Coordinate& coord);
     void set_piece_scale(float scale);
+    void set_controlled_squares(Board& board, Coordinate& coord) const;
+
+    bool is_white() const;
+    bool is_black() const;
 
     Coordinate get_coordinate() const;
 
