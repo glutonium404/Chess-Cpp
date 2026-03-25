@@ -19,4 +19,5 @@ private:
 
     void add_forward_moves(Board& board);
     void add_diagonal_moves(Board& board);
+    void add_en_passant(Board& board);
 };

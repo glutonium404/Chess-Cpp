@@ -13,7 +13,6 @@ public:
     );
 
     TYPE get_type() const override;
-    void set_legal_moves(Board& board) override;
 
 private:
 };

@@ -81,6 +81,38 @@ void Piece::setup_sprite() {
     sprite.setOrigin(local_bound.width / 2.f, local_bound.height / 2.f);
 }
 
+void Piece::set_legal_moves(Board& board) {
+    auto& kings_attackers = board.get_king(color)->attacked_by;
+
+    // in terms of double check, the king must be moved hence no other piece has any valid moves
+    if(kings_attackers.size() > 1) return;
+
+    for(auto& dir: directions) {
+        for(Coordinate curr_coord = coordinate + dir; curr_coord.is_valid(); curr_coord += dir) {
+            set_controlled_squares(board, curr_coord);
+
+            if(is_pinned && (dir != pinned_dir && dir != (pinned_dir * -1))) {
+                // if the piece is pinned, it can only move in the direction of the pin or the opposite direction
+                // so we skip any direction that is not the direction of the pin or the opposite direction
+                continue;
+            }
+
+            if(add_common_legal_moves(board, curr_coord.row, curr_coord.col))
+                break;
+        }
+    }
+
+    // if there is a check on king that is not a double check,
+    // the only valid moves are the ones that block the check or eliminates the attacker
+    // through finding the intersection between both the piece and the attackers legal move,
+    // we can determine which moves intersect the check. filter_legal_moves() does exactly that
+    if(kings_attackers.size() > 0) {
+        // if not double check then there is only one attacker
+        auto& attacker = kings_attackers[0];
+        legal_moves = get_check_elimination_moves(attacker, board.get_king(color));
+    }
+}
+
 bool Piece::add_common_legal_moves(Board& board, const int row, const int col) {
     auto& sq = board.get_square(row, col);
 

@@ -96,6 +96,10 @@ void Pawn::add_diagonal_moves(Board& board) {
     }
 }
 
+void Pawn::add_en_passant(Board& board) {
+
+}
+
 Piece::TYPE Pawn::get_type() const {
     return Piece::TYPE::PAWN;
 }

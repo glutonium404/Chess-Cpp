@@ -39,7 +39,7 @@ public:
     virtual ~Piece();
 
     virtual TYPE get_type() const = 0;
-    virtual void set_legal_moves(Board& board) = 0;
+    virtual void set_legal_moves(Board& board);
 
     void draw();
     void set_coordinate(int row, int col);
@@ -61,6 +61,8 @@ private:
 
 protected:
     Coordinate coordinate;
+    std::vector<Coordinate> directions;
+
     bool       has_moved = false;
 
     bool add_common_legal_moves(Board& board, const int row, const int col);
