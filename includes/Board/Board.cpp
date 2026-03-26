@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <memory>
+#include <my_utils.hpp>
 
 Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
     w_pieces.reserve(16);
@@ -125,7 +126,10 @@ void Board::highlight_legal_moves(const std::shared_ptr<Piece>& piece) {
     for(auto& coord: highlighted_coord) {
         auto& sq = get_square(coord);
 
-        if(sq.piece && sq.piece->color != current_turn) {
+        bool is_en_pass_sq = (coord == Coordinate(en_passant_row, en_passant_file));
+        bool is_oppo_piece = (sq.piece && sq.piece->color != current_turn); 
+
+        if(is_en_pass_sq || is_oppo_piece) {
             sq.highlight(Square::red_highlight);
         }else {
             sq.highlight();
@@ -166,9 +170,21 @@ Coordinate Board::get_clicked_coordinate() {
 void Board::make_move(Square& new_square) {
     if(!selected_square || !selected_square->piece) return;
 
-    update_zobrist_variables(new_square);
+    bool is_en_pass_sq = (new_square.coordinate == Coordinate(en_passant_row, en_passant_file));
+    bool is_oppo_piece = (new_square.piece && new_square.piece->color != current_turn); 
 
-    if(new_square.piece && new_square.piece->color != current_turn) new_square.piece->is_alive = false;
+    // call this before updating zobrist varaibles
+    // otherwise they'll be reset
+    if(is_en_pass_sq) {
+        auto& oppo_piece_sq = get_square(selected_square->coordinate.row, en_passant_file);
+        if(oppo_piece_sq.piece) oppo_piece_sq.piece = nullptr;
+    }
+
+    if(is_oppo_piece) {
+        new_square.piece->is_alive = false;
+    }
+
+    update_zobrist_variables(new_square);
 
     new_square.piece = selected_square->piece;
     new_square.piece->set_coordinate(new_square.coordinate);
@@ -287,6 +303,9 @@ void Board::update_zobrist_hash() {
 
 void Board::update_zobrist_variables(Square& new_square) {
     en_passant_file = -1;
+    en_passant_row  = -1;
+
+    if(!selected_square->piece) return;
 
     const auto& np        = new_square.piece;
     const auto& sp        = selected_square->piece;
@@ -302,8 +321,10 @@ void Board::update_zobrist_variables(Square& new_square) {
 
     // check en passant possibility
     if(is_pawn && !has_moved) {
-        if(std::abs( new_square.coordinate.row - selected_square->coordinate.row ) > 1)
-            en_passant_file = static_cast<std::size_t>(selected_square->coordinate.col);
+        if(std::abs( new_square.coordinate.row - selected_square->coordinate.row ) > 1) {
+            en_passant_file = new_square.coordinate.col;
+            en_passant_row  = new_square.coordinate.row - (sp->is_white() ? -1 : +1);
+        }
     }
 
     // check for king move

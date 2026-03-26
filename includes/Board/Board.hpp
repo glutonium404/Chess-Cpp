@@ -22,8 +22,9 @@ public:
     sf::FloatRect     board_local_bound;
     Piece::COLOR      current_turn = Piece::COLOR::WHITE;
 
-    std::size_t       castling_right = 15; // using bitset. 15 = 1111
-    int               en_passant_file = -1; // negative = no en passsant available yet
+    std::size_t       castling_right   = 15; // using bitset. 15 = 1111
+    int               en_passant_file  = -1; // negative = no en passsant available yet
+    int               en_passant_row   = -1; // negative = no en passsant available yet
 
     enum class CR { WK = 1, WQ = 2, BK = 4, BQ = 8 }; // Castling Rights. Corresponds to bitset
 

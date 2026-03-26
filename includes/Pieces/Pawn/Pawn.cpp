@@ -1,5 +1,6 @@
 #include "Pawn.hpp"
 #include "../../Board/Board.hpp"
+#include <my_utils.hpp>
 
 Pawn::Pawn(
     sf::RenderWindow&   render_window,
@@ -30,6 +31,7 @@ void Pawn::set_legal_moves(Board& board) {
 
     add_forward_moves(board);
     add_diagonal_moves(board);
+    add_en_passant(board);
 
     if(kings_attackers.size() > 0) {
         const auto& attacker = kings_attackers[0];
@@ -72,10 +74,11 @@ void Pawn::add_diagonal_moves(Board& board) {
 
     for(int diag_col: diag_cols) {
         Coordinate diag_coord = Coordinate(forward_row, diag_col);
-        Square&    diag_sq    = board.get_square(diag_coord);
 
         if(!diag_coord.is_valid())
             continue;
+
+        Square& diag_sq = board.get_square(diag_coord);
 
         set_controlled_squares(board, diag_coord);
 
@@ -97,7 +100,36 @@ void Pawn::add_diagonal_moves(Board& board) {
 }
 
 void Pawn::add_en_passant(Board& board) {
+    if(board.en_passant_file < 0) return;
 
+    int adj_cols[] = { coordinate.col - 1, coordinate.col + 1 };
+
+    for (const auto& col : adj_cols) {
+
+        if(!Coordinate::is_valid(coordinate.row, col))
+            continue;
+
+        const auto& adj_p = board.get_square(coordinate.row, col).piece;
+
+        if(!adj_p || adj_p->color == color)
+            continue;
+
+        if(adj_p->get_coordinate().col != board.en_passant_file)
+            continue;
+
+        // the following two conditions check for double pawns
+        if(adj_p->is_white() && adj_p->get_coordinate().row != 5)
+            continue;
+
+        if(adj_p->is_black() && adj_p->get_coordinate().row != 4)
+            continue;
+
+        int forward_row = coordinate.row + direction;
+
+        legal_moves.push_back({ forward_row, board.en_passant_file });
+
+        adj_p->attacked_by.push_back(this);
+    }
 }
 
 Piece::TYPE Pawn::get_type() const {
