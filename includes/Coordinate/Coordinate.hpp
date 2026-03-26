@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
 
 struct Coordinate {
@@ -19,6 +20,7 @@ struct Coordinate {
     bool is_valid() const;
     std::string log() const;
     Coordinate getStepValues() const;
+    std::size_t to_index() const;
 
     static bool is_valid(const int row, const int col);
 };

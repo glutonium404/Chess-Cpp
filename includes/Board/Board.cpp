@@ -1,8 +1,9 @@
 #include "Board.hpp"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
+#include <cstddef>
+#include <cstdlib>
 #include <memory>
-#include <my_utils.hpp>
 
 Board::Board(float board_width, sf::RenderWindow& render_window) : render_window(render_window) {
     w_pieces.reserve(16);
@@ -14,6 +15,7 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
     set_squares();
     set_pieces();
     add_pieces_to_board();
+    populate_look_up_tables();
     update_legal_moves();
 }
 
@@ -82,9 +84,11 @@ void Board::highlighted_square_clicked(Square& new_selected_square) {
     remove_existing_highilights();
     make_move(new_selected_square);
     toggle_player();
+    update_zobrist_hash();
     reset_variables(); // call this before updating pinned_pieaces and legal_moves
     update_pinned_pieces();
     update_legal_moves();
+    check_game_state();
 }
 
 void Board::own_piece_clicked(Square& new_selected_square) {
@@ -161,6 +165,8 @@ Coordinate Board::get_clicked_coordinate() {
 
 void Board::make_move(Square& new_square) {
     if(!selected_square || !selected_square->piece) return;
+
+    update_zobrist_variables(new_square);
 
     if(new_square.piece && new_square.piece->color != current_turn) new_square.piece->is_alive = false;
 
@@ -251,6 +257,83 @@ void Board::update_pinned_pieces() {
                 }
             }
         }
+    }
+}
+
+void Board::update_zobrist_hash() {
+    hash = 0;
+
+    for(const auto& row: squares) {
+        for(const auto& sq: row) {
+            if(!sq.piece) continue;
+
+            std::size_t color_index = static_cast<std::size_t>(sq.piece->color);
+            std::size_t type_index = static_cast<std::size_t>(sq.piece->get_type());
+
+            hash ^= piece_table[ color_index ][ type_index ][ sq.coordinate.to_index() ];
+        }
+    }
+
+    if(current_turn == Piece::COLOR::BLACK)
+        hash ^= side_to_move;
+
+    if(en_passant_file > 0)
+        hash ^= en_passant_file_table[static_cast<std::size_t>(en_passant_file - 1)];
+
+    hash ^= castling_right_table[castling_right];
+
+    repetition_list[hash]++;
+}
+
+void Board::update_zobrist_variables(Square& new_square) {
+    en_passant_file = -1;
+
+    const auto& np        = new_square.piece;
+    const auto& sp        = selected_square->piece;
+    const auto& type      = sp->get_type();
+    const bool  has_moved = sp->has_moved;
+
+    const bool is_pawn = type == Piece::TYPE::PAWN;
+    const bool is_king = type == Piece::TYPE::KING;
+    const bool is_rook = type == Piece::TYPE::ROOK;
+
+    if(is_pawn || np)
+        repetition_list.clear();
+
+    // check en passant possibility
+    if(is_pawn && !has_moved) {
+        if(std::abs( new_square.coordinate.row - selected_square->coordinate.row ) > 1)
+            en_passant_file = static_cast<std::size_t>(selected_square->coordinate.col);
+    }
+
+    // check for king move
+    if(is_king && !has_moved) {
+        if(sp->is_white())
+            castling_right &= ~( static_cast<std::size_t>(CR::WK) | static_cast<std::size_t>(CR::WQ) );
+        else
+            castling_right &= ~( static_cast<std::size_t>(CR::BK) | static_cast<std::size_t>(CR::BQ) );
+    }
+
+    // check for rook move
+    if(is_rook && !has_moved) {
+        if(selected_square->coordinate.col == 8) // king side rook moved
+            castling_right &= ~static_cast<std::size_t>(sp->is_white() ? CR::WK : CR::BK);
+        else // queen side rook moved
+            castling_right &= ~static_cast<std::size_t>(sp->is_white() ? CR::WQ : CR::BQ);
+    }
+
+    // if a rook is captured
+    if(np && np->get_type() == Piece::TYPE::ROOK && !np->has_moved) {
+        if(new_square.coordinate.col == 8) // king side rook captured
+            castling_right &= ~static_cast<std::size_t>(np->is_white() ? CR::WK : CR::BK);
+        else // queen side rook captured
+            castling_right &= ~static_cast<std::size_t>(np->is_white() ? CR::WQ : CR::BQ);
+    }
+}
+
+void Board::check_game_state() {
+    if(repetition_list[hash] >= 3) {
+        // handle draw
     }
 }
 

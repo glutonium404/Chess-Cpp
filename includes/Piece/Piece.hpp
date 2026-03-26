@@ -12,8 +12,8 @@ class Board;
 
 class Piece {
 public:
-    enum class COLOR { BLACK, WHITE };
-    enum class TYPE  { KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN };
+    enum class COLOR { WHITE = 0, BLACK = 1 };
+    enum class TYPE  { KING = 0, QUEEN, ROOK, BISHOP, KNIGHT, PAWN };
 
     sf::RenderWindow&       render_window;
     std::string             texture_path;
@@ -26,6 +26,7 @@ public:
     float                   square_length;
 
     bool                    is_pinned = false;
+    bool                    has_moved = false;
     Coordinate              pinned_dir = Coordinate(9, 9);
 
     Piece(
@@ -62,8 +63,6 @@ private:
 protected:
     Coordinate coordinate;
     std::vector<Coordinate> directions;
-
-    bool       has_moved = false;
 
     bool add_common_legal_moves(Board& board, const int row, const int col);
     std::vector<Coordinate> get_check_elimination_moves(const Piece* const attacker, const std::shared_ptr<Piece>& king);

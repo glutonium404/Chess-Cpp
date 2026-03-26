@@ -8,8 +8,11 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <array>
+#include <unordered_map>
 #include <vector>
 
 class Board {
@@ -18,6 +21,11 @@ public:
     sf::RenderWindow& render_window;
     sf::FloatRect     board_local_bound;
     Piece::COLOR      current_turn = Piece::COLOR::WHITE;
+
+    std::size_t       castling_right = 15; // using bitset. 15 = 1111
+    int               en_passant_file = -1; // negative = no en passsant available yet
+
+    enum class CR { WK = 1, WQ = 2, BK = 4, BQ = 8 }; // Castling Rights. Corresponds to bitset
 
     Board(float board_width, sf::RenderWindow& render_window);
 
@@ -39,6 +47,15 @@ private:
 
     Square* selected_square = nullptr;
 
+    // Zobrist hasing constants
+    uint64_t piece_table[2][6][64];
+    uint64_t castling_right_table[16];
+    uint64_t en_passant_file_table[8];
+    uint64_t side_to_move;
+    uint64_t hash = 0;
+
+    std::unordered_map<uint64_t, unsigned int> repetition_list;
+
     bool    is_mouse_clicked(sf::Event& event) const;
 
     void    handle_click(sf::Event& event);
@@ -57,6 +74,11 @@ private:
     void    highlighted_square_clicked(Square& new_selected_square);
     void    own_piece_clicked(Square& new_selected_square);
     void    manage_check_highlights();
+
+    void    populate_look_up_tables();
+    void    update_zobrist_hash();
+    void    update_zobrist_variables(Square& new_square);
+    void    check_game_state();
 
     Coordinate  get_clicked_coordinate();
 

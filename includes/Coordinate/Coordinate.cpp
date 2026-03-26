@@ -43,6 +43,10 @@ Coordinate Coordinate::getStepValues() const {
     };
 }
 
+std::size_t Coordinate::to_index() const {
+    return (((row - 1) * 8) + col) - 1;
+}
+
 std::string Coordinate::log() const {
     std::string msg = "{";
     msg += std::to_string(row);

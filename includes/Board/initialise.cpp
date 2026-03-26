@@ -5,6 +5,9 @@
 #include "../Pieces/Bishop/Bishop.hpp"
 #include "../Pieces/Knight/Knight.hpp"
 #include "../Pieces/Pawn/Pawn.hpp"
+#include <cstdint>
+#include <random>
+#include <my_utils.hpp>
 
 void Board::set_board_local_bound(float& board_width) {
     sf::Vector2u window_dim = render_window.getSize();
@@ -42,6 +45,30 @@ void Board::set_squares() {
             if(j != 7) { flag = !flag; }
         }
     }
+}
+
+void Board::populate_look_up_tables() {
+    unsigned int seed = 42;
+    std::mt19937_64 engine(seed);
+    std::uniform_int_distribution<uint64_t> dist(0, UINT64_MAX);
+
+    for(int i=0; i<2; i++) {
+        for(int j=0; j<6; j++) {
+            for(int k=0; k<64; k++) {
+                piece_table[i][j][k] = dist(engine);
+            }
+        }
+    }
+
+    for(int i=0; i<16; i++) {
+        castling_right_table[i] = dist(engine);
+    }
+
+    for(int i=0; i<8; i++) {
+        en_passant_file_table[i] = dist(engine);
+    }
+
+    side_to_move = dist(engine);
 }
 
 void Board::set_pieces() {
