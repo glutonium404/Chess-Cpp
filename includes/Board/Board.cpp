@@ -22,6 +22,8 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
 }
 
 void Board::handle_event(sf::Event& event) {
+    if(game_state != 0) return;
+
     if(is_mouse_clicked(event))
         handle_click(event);
 }
@@ -33,14 +35,29 @@ void Board::draw() {
         }
     }
 
-    if(!promotion_coord.is_valid())
-        return;
+    if(promotion_coord.is_valid()) {
+        render_window.draw(dimmer);
 
-    render_window.draw(dimmer);
+        for(auto& sq: promotion_selection_list) {
+            sq.draw(render_window);
+            sq.piece->draw();
+        }
+    }
 
-    for(auto& sq: promotion_selection_list) {
-        sq.draw(render_window);
-        sq.piece->draw();
+    if(game_state != 0) {
+        std::string message;
+
+        if(game_state == 1) {
+            message = "WHITE WON!";
+        }else if(game_state == 2) {
+            message = "BLACK WON!";
+        }else {
+            message = "DRAW!";
+        }
+
+        show_game_over(message);
+        render_window.draw(dimmer);
+        render_window.draw(text);
     }
 }
 
@@ -265,6 +282,8 @@ void Board::make_move(Square& new_square) {
     new_square.piece = selected_square->piece;
     new_square.piece->set_coordinate(new_square.coordinate);
     selected_square->piece = nullptr;
+
+    half_move_clock++;
 }
 
 // in set legal moves, we have to check if the king is in check or not
@@ -284,6 +303,11 @@ void Board::update_legal_moves() {
 
         piece->legal_moves.clear();
         piece->set_legal_moves(*this);
+
+        if(piece->legal_moves.size() > 0) {
+            if(piece->is_white()) w_has_legal_moves = true;
+            else                  b_has_legal_moves = true;
+        }
     }
 
     for(auto& piece: second_batch) {
@@ -291,6 +315,11 @@ void Board::update_legal_moves() {
 
         piece->legal_moves.clear();
         piece->set_legal_moves(*this);
+
+        if(piece->legal_moves.size() > 0) {
+            if(piece->is_white()) w_has_legal_moves = true;
+            else                  b_has_legal_moves = true;
+        }
     }
 }
 
@@ -392,8 +421,10 @@ void Board::update_zobrist_variables(Square& new_square) {
     const bool is_king = type == Piece::TYPE::KING;
     const bool is_rook = type == Piece::TYPE::ROOK;
 
-    if(is_pawn || np)
+    if(is_pawn || np) {
         repetition_list.clear();
+        half_move_clock = 0;
+    }
 
     // check en passant possibility
     if(is_pawn && !has_moved) {
@@ -429,9 +460,58 @@ void Board::update_zobrist_variables(Square& new_square) {
 }
 
 void Board::check_game_state() {
-    if(repetition_list[hash] >= 3) {
+    if(repetition_list[hash] >= 3 || half_move_clock >= 100) {
         // handle draw
+        game_state = 3;
+        return;
     }
+
+    const auto& w_king = get_king(Piece::COLOR::WHITE);
+    const auto& b_king = get_king(Piece::COLOR::BLACK);
+
+    if(!w_has_legal_moves) {
+        if(w_king->attacked_by.size() > 0) {
+            game_state = 2;
+        }else {
+            game_state = 3;
+        }
+
+        return;
+    }
+
+    if(!b_has_legal_moves) {
+        if(b_king->attacked_by.size() > 0) {
+            game_state = 1;
+        }else {
+            game_state = 3;
+        }
+
+        return;
+    }
+}
+
+void Board::show_game_over(const std::string& message) {
+
+    // Add this inside your Board::Board constructor in Board.cpp
+    if (!game_over_font.loadFromFile("./assets/roboto.ttf")) {
+        std::cerr << "Error loading font!" << std::endl;
+    }
+
+    text.setFont(game_over_font);
+    text.setString(message);
+    text.setCharacterSize(80); // Big text!
+    text.setFillColor(sf::Color::White);
+    text.setStyle(sf::Text::Bold);
+
+    sf::FloatRect text_rect = text.getLocalBounds();
+
+    text.setOrigin(text_rect.left + text_rect.width / 2.0f,
+                   text_rect.top  + text_rect.height / 2.0f);
+
+    float board_center_x = board_local_bound.left + board_local_bound.width / 2.0f;
+    float board_center_y = board_local_bound.top + board_local_bound.height / 2.0f;
+
+    text.setPosition(sf::Vector2f(board_center_x, board_center_y));
 }
 
 Square& Board::get_square(int row, int col) {
@@ -447,6 +527,9 @@ void Board::toggle_player() {
 }
 
 void Board::reset_variables() {
+    w_has_legal_moves = false;
+    b_has_legal_moves = false;
+
     for(auto& row: squares) {
         for(auto& sq: row) {
             sq.is_controlled_by_black = false;

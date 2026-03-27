@@ -3,6 +3,7 @@
 #include "../Piece/Piece.hpp"
 #include "../Square/Square.hpp"
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -25,6 +26,7 @@ public:
     std::size_t       castling_right   = 15; // using bitset. 15 = 1111
     int               en_passant_file  = -1; // negative = no en passsant available yet
     int               en_passant_row   = -1; // negative = no en passsant available yet
+    int               half_move_clock  =  0;
 
     enum class CR { WK = 1, WQ = 2, BK = 4, BQ = 8 }; // Castling Rights. Corresponds to bitset
 
@@ -47,8 +49,15 @@ private:
     std::vector<std::shared_ptr<Piece>>     w_pieces;
 
     sf::RectangleShape                      dimmer;
+    sf::Font                                game_over_font;
+    sf::Text                                text;
 
     Square* selected_square = nullptr;
+
+    bool w_has_legal_moves = false;
+    bool b_has_legal_moves = false;
+
+    int  game_state = 0; // 0 = ongoing, 1 = white wins, 2 = black wins, 3 = draw
 
     // Zobrist hasing constants
     uint64_t piece_table[2][6][64];
@@ -88,6 +97,7 @@ private:
     void    update_zobrist_hash();
     void    update_zobrist_variables(Square& new_square);
     void    check_game_state();
+    void    show_game_over(const std::string& message);
 
     Coordinate  get_clicked_coordinate();
 
