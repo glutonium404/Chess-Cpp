@@ -31,12 +31,28 @@ void King::set_legal_moves(Board& board) {
     };
 
     for(auto& coord: common_lookup_coordinates) {
+        bool skip = false;
+
+        for(const auto& attacker: attacked_by) {
+            if(attacker->get_type() == Piece::TYPE::KNIGHT || attacker->get_type() == Piece::TYPE::PAWN)
+                continue;
+
+            Coordinate attack_dir = ( (attacker->get_coordinate() - coordinate).getStepValues() ) * -1;
+
+            if(attack_dir + coordinate == coord) skip = true;
+        }
+
+        if(skip)
+            continue;
+
         if(coord.is_valid()) {
             auto& sq = board.get_square(coord);
 
             set_controlled_squares(board, coord);
 
-            if(( is_white() && !sq.is_controlled_by_black ) || ( is_black() && !sq.is_controlled_by_white ))
+            bool is_safe = ( is_white() && !sq.is_controlled_by_black ) || ( is_black() && !sq.is_controlled_by_white );
+
+            if(is_safe)
                 add_common_legal_moves(board, coord.row, coord.col);
         }
     }
