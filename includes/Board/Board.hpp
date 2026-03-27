@@ -46,6 +46,8 @@ private:
     std::vector<std::shared_ptr<Piece>>     b_pieces;
     std::vector<std::shared_ptr<Piece>>     w_pieces;
 
+    sf::RectangleShape                      dimmer;
+
     Square* selected_square = nullptr;
 
     // Zobrist hasing constants
@@ -57,6 +59,10 @@ private:
 
     std::unordered_map<uint64_t, unsigned int> repetition_list;
 
+    // promotion related varaiables
+    Coordinate          promotion_coord = Coordinate(0, 0);
+    std::vector<Square> promotion_selection_list;
+
     bool    is_mouse_clicked(sf::Event& event) const;
 
     void    handle_click(sf::Event& event);
@@ -64,6 +70,8 @@ private:
     void    set_squares();
     void    set_pieces();
     void    add_pieces_to_board();
+    void    set_promotion_selection_list();
+    void    show_promotion_selection_list(const int row, const int col);
     void    highlight_legal_moves(const std::shared_ptr<Piece>& piece);
     void    remove_existing_highilights();
     void    make_move(Square& new_square);

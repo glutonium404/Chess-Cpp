@@ -19,6 +19,10 @@ void Board::set_board_local_bound(float& board_width) {
     board_local_bound.top       = offset_y;
     board_local_bound.width     = square_length * 8.f;
     board_local_bound.height    = square_length * 8.f;
+
+    dimmer.setSize({ board_local_bound.width, board_local_bound.height });
+    dimmer.setPosition({ board_local_bound.left, board_local_bound.top });
+    dimmer.setFillColor(sf::Color(0, 0, 0, 200));
 }
 
 void Board::set_squares() {
@@ -125,6 +129,83 @@ void Board::add_pieces_to_board() {
     for(auto& piece: b_pieces) {
         auto coord = piece->get_coordinate();
         squares[coord.row - 1][coord.col - 1].piece = piece;
+    }
+}
+
+void Board::set_promotion_selection_list() {
+    promotion_selection_list.reserve(4);
+
+    int row = 1;
+    int col = 1;
+
+    int mul            = (row < 4) ? 1 : -1;
+    Piece::COLOR color = (row < 4) ? Piece::COLOR::WHITE : Piece::COLOR::BLACK;
+
+    for(int i=0; i<4; i++) {
+        Square sq;
+        sq.coordinate = Coordinate( row + (i * mul), col );
+
+        sf::Vector2f pos = {
+            (sq.coordinate.col - 1) * square_length + board_local_bound.left,
+            (sq.coordinate.row - 1) * square_length + board_local_bound.top 
+        };
+
+        sq.shape = sf::RectangleShape({ square_length, square_length });
+        sq.shape.setFillColor(sf::Color(156, 156, 156));
+        sq.shape.setPosition(pos);
+        sq.shape.setOutlineThickness(2.f);
+        sq.shape.setOutlineColor(sf::Color::Black);
+        sq.type = Square::COLOR::LIGHT; // doesn't really matter
+
+        switch (i) {
+            case 0:
+                sq.piece = make_queen(sq.coordinate.row, sq.coordinate.col, color);
+                break;
+            case 1:
+                sq.piece = make_knight(sq.coordinate.row, sq.coordinate.col, color);
+                break;
+            case 2:
+                sq.piece = make_rook(sq.coordinate.row, sq.coordinate.col, color);
+                break;
+            case 3:
+                sq.piece = make_bishop(sq.coordinate.row, sq.coordinate.col, color);
+                break;
+        }
+
+        promotion_selection_list.push_back(sq);
+    }
+}
+
+void Board::show_promotion_selection_list(const int row, const int col) {
+    int mul            = (row < 4) ? 1 : -1;
+    Piece::COLOR color = (row < 4) ? Piece::COLOR::WHITE : Piece::COLOR::BLACK;
+
+    #define psl promotion_selection_list
+
+    for(int i=0; i<4; i++) {
+        psl[i].coordinate = Coordinate( row + (i * mul), col );
+
+        sf::Vector2f pos = {
+            (psl[i].coordinate.col - 1) * square_length + board_local_bound.left,
+            (psl[i].coordinate.row - 1) * square_length + board_local_bound.top 
+        };
+
+        psl[i].shape.setPosition(pos);
+
+        switch (i) {
+            case 0:
+                psl[i].piece = make_queen(psl[i].coordinate.row, psl[i].coordinate.col, color);
+                break;
+            case 1:
+                psl[i].piece = make_knight(psl[i].coordinate.row, psl[i].coordinate.col, color);
+                break;
+            case 2:
+                psl[i].piece = make_rook(psl[i].coordinate.row, psl[i].coordinate.col, color);
+                break;
+            case 3:
+                psl[i].piece = make_bishop(psl[i].coordinate.row, psl[i].coordinate.col, color);
+                break;
+        }
     }
 }
 

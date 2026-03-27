@@ -16,6 +16,7 @@ Board::Board(float board_width, sf::RenderWindow& render_window) : render_window
     set_squares();
     set_pieces();
     add_pieces_to_board();
+    set_promotion_selection_list();
     populate_look_up_tables();
     update_legal_moves();
 }
@@ -31,6 +32,16 @@ void Board::draw() {
             square.draw(render_window);
         }
     }
+
+    if(!promotion_coord.is_valid())
+        return;
+
+    render_window.draw(dimmer);
+
+    for(auto& sq: promotion_selection_list) {
+        sq.draw(render_window);
+        sq.piece->draw();
+    }
 }
 
 void Board::handle_click(sf::Event& event) {
@@ -39,6 +50,38 @@ void Board::handle_click(sf::Event& event) {
     if(!clicked_coordinate.is_valid()) return;
 
     Square& new_selected_square = get_square(clicked_coordinate);
+
+    // handle promotion
+    if(promotion_coord.is_valid()) {
+        for(const auto& sq: promotion_selection_list) {
+            if(sq.coordinate == clicked_coordinate) {
+                if (sq.piece->is_white()) {
+                    w_pieces.insert(w_pieces.end() - 1, sq.piece);
+                } else {
+                    b_pieces.insert(b_pieces.end() - 1, sq.piece);
+                }
+
+                get_square(promotion_coord).piece->is_alive = false;
+                get_square(promotion_coord).piece = sq.piece;
+                get_square(promotion_coord).piece->set_coordinate(promotion_coord);
+
+                promotion_coord.row = 0;
+                promotion_coord.col = 0;
+            }
+        }
+
+        if(promotion_coord.is_valid())
+            return;
+
+        toggle_player();
+        update_zobrist_hash();
+        reset_variables(); // call this before updating pinned_pieaces and legal_moves
+        update_pinned_pieces();
+        update_legal_moves();
+        check_game_state();
+        manage_check_highlights();
+        return;
+    }
 
     // return is the same piece is clicked again
     if(selected_square == &new_selected_square) return;
@@ -84,6 +127,10 @@ void Board::highlighted_square_clicked(Square& new_selected_square) {
     selected_square->unhighlight();
     remove_existing_highilights();
     make_move(new_selected_square);
+
+    if(promotion_coord.is_valid())
+        return;
+
     toggle_player();
     update_zobrist_hash();
     reset_variables(); // call this before updating pinned_pieaces and legal_moves
@@ -173,6 +220,7 @@ void Board::make_move(Square& new_square) {
     bool is_en_pass_sq = (new_square.coordinate == Coordinate(en_passant_row, en_passant_file));
     bool is_oppo_piece = (new_square.piece && new_square.piece->color != current_turn); 
 
+    bool is_pawn       = (selected_square->piece->get_type() == Piece::TYPE::PAWN);
     bool is_king       = (selected_square->piece->get_type() == Piece::TYPE::KING);
     bool is_castling   = is_king && ( std::abs(new_square.coordinate.col - selected_square->coordinate.col) == 2 );
 
@@ -205,6 +253,11 @@ void Board::make_move(Square& new_square) {
         new_rook_sq.piece->set_coordinate(new_rook_sq.coordinate);
 
         rook_sq.piece = nullptr;
+    }
+
+    if(is_pawn && (new_square.coordinate.row == 1 || new_square.coordinate.row == 8)) {
+        promotion_coord = new_square.coordinate;
+        show_promotion_selection_list(new_square.coordinate.row, new_square.coordinate.col);
     }
 
     update_zobrist_variables(new_square);
