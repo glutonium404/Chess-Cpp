@@ -57,7 +57,7 @@ void King::set_legal_moves(Board& board) {
         }
     }
 
-    if(has_moved) return;
+    if(has_moved || attacked_by.size() > 0) return;
 
     std::size_t k = is_white() ? static_cast<std::size_t>(Board::CR::WK) : static_cast<std::size_t>(Board::CR::BK);
     std::size_t q = is_white() ? static_cast<std::size_t>(Board::CR::WQ) : static_cast<std::size_t>(Board::CR::BQ);
