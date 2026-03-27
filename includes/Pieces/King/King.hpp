@@ -16,4 +16,6 @@ public:
     void set_legal_moves(Board& board) override;
 
 private:
+    void add_king_side_castling(Board& board);
+    void add_queen_side_castling(Board& board);
 };

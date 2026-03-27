@@ -173,6 +173,9 @@ void Board::make_move(Square& new_square) {
     bool is_en_pass_sq = (new_square.coordinate == Coordinate(en_passant_row, en_passant_file));
     bool is_oppo_piece = (new_square.piece && new_square.piece->color != current_turn); 
 
+    bool is_king       = (selected_square->piece->get_type() == Piece::TYPE::KING);
+    bool is_castling   = is_king && ( std::abs(new_square.coordinate.col - selected_square->coordinate.col) == 2 );
+
     // call this before updating zobrist varaibles
     // otherwise they'll be reset
     if(is_en_pass_sq) {
@@ -182,6 +185,26 @@ void Board::make_move(Square& new_square) {
 
     if(is_oppo_piece) {
         new_square.piece->is_alive = false;
+    }
+
+    if(is_castling) { // we are only setting the rook here
+        int old_col, new_col;
+
+        if(new_square.coordinate.col > 5) { // king side castle
+            old_col = 8;
+            new_col = 6;
+        }else { // queen side
+            old_col = 1;
+            new_col = 4;
+        }
+
+        auto& rook_sq     = get_square(new_square.coordinate.row, old_col);
+        auto& new_rook_sq = get_square(new_square.coordinate.row, new_col);
+
+        new_rook_sq.piece = rook_sq.piece;
+        new_rook_sq.piece->set_coordinate(new_rook_sq.coordinate);
+
+        rook_sq.piece = nullptr;
     }
 
     update_zobrist_variables(new_square);
