@@ -383,7 +383,3 @@ When extending gameplay logic:
 5. Keep king vectors at end of `w_pieces` / `b_pieces` unless refactoring `Board::get_king`.
 
 For rendering changes, keep board coordinate assumptions 1-based and aligned with `Coordinate` utilities.
-
----
-
-If you want, I can also add a developer-focused architecture diagram section (class relationship + move pipeline diagram) in a follow-up update.
